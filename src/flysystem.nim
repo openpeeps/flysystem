@@ -20,7 +20,6 @@
 ## set permissions or access controls depending on the storage backend.
 
 import std/[macros, os, memfiles, strutils, tables, options, times]
-import pkg/openparser/[json, yaml, toml]
 
 type        
   Visibility* = enum
@@ -212,37 +211,6 @@ proc disk*(fs: Filesystem, name = ""): StorageDriver =
     raise newException(StorageError, "Disk not found: " & key)
   fs.disks[key]
 
-proc parseYaml*(fs: Filesystem, path: string): YAMLObject =
-  ## Convenience method to read and parse a YAML file from the default disk
-  let content = fs.disk().read(path)
-  parseYaml(content)
-
-proc parseYaml*[T](fs: Filesystem, path: string, t: typedesc[T]): T =
-  ## Generic version of parseYaml that returns a typed result. The caller can specify
-  ## the expected type (like a config object) and the YAML will be parsed into that type.
-  let content = fs.disk().read(path)
-  parseYaml(content, t)
-
-proc parseJson*(fs: Filesystem, path: string): JsonNode =
-  ## Convenience method to read and parse a JSON file from the default disk
-  let content = fs.disk().read(path)
-  fromJson(content)
-
-proc parseJson*[T](fs: Filesystem, path: string, t: typedesc[T]): T =
-  ## Generic version of parseJson that returns a typed result. The caller can specify
-  ## the expected type (like a config object) and the JSON will be parsed into that type.
-  let content = fs.disk().read(path)
-  fromJson(content, t)
-
-proc parseToml*(fs: Filesystem, path: string): TomlNode =
-  ## Convenience method to read and parse a TOML file from the default disk
-  let content = fs.disk().read(path)
-  parseToml(content)
-
-proc parseCsv*(fs: Filesystem, path: string) =
-  ## Convenience method to read and parse a CSV file from the default disk
-  discard
-
 proc write*(fs: Filesystem, path, content: string, visibility = visPrivate) {.inline.} =
   ## Convenience method to write a file to the default disk
   fs.disk().write(path, content, visibility)
@@ -258,3 +226,46 @@ proc exists*(fs: Filesystem, path: string): bool {.inline.} =
 proc delete*(fs: Filesystem, path: string) {.inline.} =
   ## Convenience method to delete a file from the default disk
   fs.disk().delete(path)
+
+
+template parseYaml*(fs: Filesystem, path: string): YAMLObject =
+  ## Convenience method to read and parse a YAML file from the default disk.
+  ## 
+  ## This template requires `openparser/yaml` to be imported in the caller module to work.
+  let content = fs.disk().read(path)
+  parseYaml(content)
+
+template parseYaml*[T](fs: Filesystem, path: string, t: typedesc[T]): T =
+  ## Generic version of parseYaml that returns a typed result. The caller can specify
+  ## the expected type (like a config object) and the YAML will be parsed into that type.
+  ## 
+  ## This template requires `openparser/yaml` to be imported in the caller module to work.
+  let content = fs.disk().read(path)
+  parseYaml(content, t)
+
+template parseJson*(fs: Filesystem, path: string): JsonNode =
+  ## Convenience method to read and parse a JSON file from the default disk
+  ## This template requires `openparser/json` to be imported in the caller module to work.
+  let content = fs.disk().read(path)
+  fromJson(content)
+
+template parseJson*[T](fs: Filesystem, path: string, t: typedesc[T]): T =
+  ## Generic version of parseJson that returns a typed result. The caller can specify
+  ## the expected type (like a config object) and the JSON will be parsed into that type.
+  ## 
+  ## This template requires `openparser/json` to be imported in the caller module to work.
+  let content = fs.disk().read(path)
+  fromJson(content, t)
+
+template parseToml*(fs: Filesystem, path: string): TomlNode =
+  ## Convenience method to read and parse a TOML file from the default disk
+  ## 
+  ## This template requires `openparser/toml` to be imported in the caller module to work
+  let content = fs.disk().read(path)
+  parseToml(content)
+
+template parseCsv*(fs: Filesystem, path: string) =
+  ## Convenience method to read and parse a CSV file from the default disk.
+  ## 
+  ## This template requires `openparser/csv` to be imported in the caller module to work.
+  discard
