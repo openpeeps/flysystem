@@ -1,27 +1,33 @@
 <p align="center">
-  <img src="https://github.com/openpeeps/PKG/blob/main/.github/logo.png" width="90px"><br>
-  OpenPeeps repository template for developing libraries,<br>projects and other cool things. 👑 Written in Nim language
+  A filesystem API for Nim, inspired by Flysystem from the PHP ecosystem.
 </p>
 
 <p align="center">
-  <code>nimble install {PKG}</code>
+  <code>nimble install flysystem</code>
 </p>
 
 <p align="center">
-  <a href="https://openpeeps.github.io/{pkg}">API reference</a><br>
-  <img src="https://github.com/openpeeps/pistachio/workflows/test/badge.svg" alt="Github Actions">  <img src="https://github.com/openpeeps/pistachio/workflows/docs/badge.svg" alt="Github Actions">
+  <a href="https://openpeeps.github.io/flysystem">API reference</a><br>
+  <img src="https://github.com/openpeeps/flysystem/workflows/test/badge.svg" alt="Github Actions">  <img src="https://github.com/openpeeps/flysystem/workflows/docs/badge.svg" alt="Github Actions">
 </p>
 
 ## 😍 Key Features
-- [x] Open Source | `MIT` License
-- [x] Written in Nim language
+- **Unified API**: A consistent interface for working with files across different storage backends (local, cloud, etc.).
+- **Extensible Drivers**: Easily add support for new storage backends by implementing the `Driver` interface.
+- **Rich Metadata**: Retrieve detailed file metadata, including size, last modified
+- **Preventing Directory Traversal**: All file operations are securely sandboxed to prevent access outside the designated root directory, mitigating directory traversal vulnerabilities.
+- **Memory-Efficient**: Designed to handle large files without loading them entirely into memory via MemFiles
 
 ## Examples
-...
+```nim
+import flysystem
+
+# todo
+```
 
 ### ❤ Contributions & Support
-- 🐛 Found a bug? [Create a new Issue](https://github.com/openpeeps/pistachio/issues)
-- 👋 Wanna help? [Fork it!](https://github.com/openpeeps/pistachio/fork)
+- 🐛 Found a bug? [Create a new Issue](https://github.com/openpeeps/flysystem/issues)
+- 👋 Wanna help? [Fork it!](https://github.com/openpeeps/flysystem/fork)
 - 😎 [Get €20 in cloud credits from Hetzner](https://hetzner.cloud/?ref=Hm0mYGM9NxZ4)
 
 ### 🎩 License
