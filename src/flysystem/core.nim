@@ -61,9 +61,21 @@ method list*(d: StorageDriver, path: string, recursive = false): seq[FileMetadat
 method move*(d: StorageDriver, src, dest: string) {.abstract.}
 method copy*(d: StorageDriver, src, dest: string) {.abstract.}
 method makeDir*(d: StorageDriver, path: string) {.abstract.}
-method deleteDir*(d: StorageDriver, path: string) {.abstract.}
+method deleteDir*(d: StorageDriver, path: string, force = false) {.abstract.}
+method touch*(d: StorageDriver, path: string) {.abstract.}
+method copyDir*(d: StorageDriver, src, dest: string) {.abstract.}
+method moveDir*(d: StorageDriver, src, dest: string) {.abstract.}
+method search*(d: StorageDriver, pattern: string): seq[string] {.abstract.}
 method setVisibility*(d: StorageDriver, path: string, visibility: Visibility) {.abstract.}
+method visibility*(d: StorageDriver, path: string): Visibility {.abstract.}
 method metadata*(d: StorageDriver, path: string): FileMetadata {.abstract.}
+method size*(d: StorageDriver, path: string): int64 {.abstract.}
+method lastModified*(d: StorageDriver, path: string): Time {.abstract.}
+method append*(d: StorageDriver, path, content: string) {.abstract.}
+method writeStream*(d: StorageDriver, path: string, src: File) {.abstract.}
+method appendStream*(d: StorageDriver, path: string, src: File) {.abstract.}
+method checksum*(d: StorageDriver, path: string): string {.abstract.}
+method mimeType*(d: StorageDriver, path: string): string {.abstract.}
 
 #
 # Filesystem — multi-disk abstraction (like Laravel's Storage facade)

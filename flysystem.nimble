@@ -10,3 +10,5 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 2.0.0"
+requires "mimedb >= 0.1.1"
+requires "checksums >= 0.2.2"
