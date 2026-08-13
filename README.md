@@ -19,6 +19,7 @@
 - **Atomic Writes**: Content is written to a temporary file and renamed over the target, so a crash mid-write never corrupts a file.
 - **Memory-Efficient**: Handle large files without loading them entirely into memory via `MemFiles`, including a zero-allocation `readLines` iterator.
 - **POSIX Tooling**: Symlinks, advisory file locking, `chmod`/`chown` and `statvfs`-based disk-usage helpers.
+- **Security Policies**: Wrap any driver with `FilesystemPolicy` to enforce read-only mode, size caps, extension/MIME allowlists, hidden-file denial and path limits — attachable per disk.
 - **Multi-Disk Facade**: Group several drivers under a `Filesystem` and switch between them with one call.
 
 ## Install
@@ -198,6 +199,44 @@ try:
   d.write("../evil.txt", "nope")
 except StorageError as e:
   echo e.msg   # "Path traversal detected: ../evil.txt"
+```
+
+### 🔒 Security policies
+```nim
+import flysystem
+
+# a policy layer wraps any driver and rejects violating operations
+# with a PolicyError (a subtype of StorageError)
+let d = newLocalDriver("/srv/uploads")
+
+let rules = PolicyRules(
+  readOnly: false,                 # deny all mutating operations
+  maxFileSize: 10 * 1024 * 1024,   # 10 MB per file (0 = unlimited)
+  maxPathLength: 255,              # max path chars (0 = unlimited)
+  maxDepth: 8,                     # max path segments (0 = unlimited)
+  denyHiddenFiles: true,           # block ".foo" files and filter listings
+  allowedExtensions: @["png", "jpg", "txt"],
+  allowedMimeTypes: @["image/png", "image/jpeg", "text/plain"])
+
+let secure = newFilesystemPolicy(d, rules)
+
+try:
+  secure.write("evil.exe", "...")  # blocked by allowedExtensions
+except PolicyError as e:
+  echo e.rule          # "allowedExtensions"
+  echo e.operation     # "write"
+
+# attach a policy to a disk on the Filesystem facade
+let fs = newFilesystem()
+fs.addDisk("uploads", d, rules)
+fs.disk("uploads").write("photo.jpg", "...")   # ok
+try:
+  fs.disk("uploads").write("payload.bin", "...")  # blocked
+except PolicyError as e:
+  echo e.rule           # "allowedExtensions" (".bin" is not allowlisted)
+
+# bypass the policy when you really need the raw driver
+fs.rawDisk("uploads").write("internal.bin", "...")
 ```
 
 ## ❤ Contributions & Support

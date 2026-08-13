@@ -18,6 +18,10 @@
 ## 
 ## The `Visibility` enum defines file visibility options (public or private), which can be used to
 ## set permissions or access controls depending on the storage backend.
+## 
+## The `FilesystemPolicy` type is a security layer that wraps any driver and enforces a
+## set of `PolicyRules` (read-only mode, size caps, extension/MIME allowlists, hidden-file
+## denial, path limits) before delegating operations.
 
-import ./flysystem/[core, local]
-export core, local
+import ./flysystem/[core, local, policy, filesystem]
+export core, local, policy, filesystem

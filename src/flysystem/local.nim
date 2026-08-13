@@ -161,13 +161,13 @@ proc collectEntries(d: LocalDriver, full: string, res: var seq[FileMetadata]) =
       collectEntries(d, entry.path, res)
 
 method list*(d: LocalDriver, path: string,
-    recursive: static bool = false): seq[FileMetadata] =
+    recursive = false): seq[FileMetadata] =
   ## Lists files and directories at the specified path. If `recursive` is true,
   ## it will list all files and directories recursively, including empty
   ## directories. Returns a sequence of FileMetadata objects.
   let full = d.resolvePath(path)
   try:
-    when recursive:
+    if recursive:
       collectEntries(d, full, result)
     else:
       for entry in walkDir(full):
