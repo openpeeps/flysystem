@@ -251,6 +251,12 @@ test "copyDir, moveDir, search":
   check d.exists("dst/b.log")
   check d.read("dst/nested/a.txt") == "a"
 
+  # copyDir preserves empty directories
+  d.makeDir("src/empty")
+  d.copyDir("src", "dst2")
+  check dirExists(root / "dst2/empty")
+  check dirExists(root / "dst2/nested")
+
   # moveDir
   d.moveDir("dst", "moved")
   check d.exists("moved/nested/a.txt")
@@ -284,6 +290,13 @@ test "symlinks, withLock, chmod, diskUsage":
   d.withLock("locked.txt"):
     d.append("locked.txt", "in lock")
   check d.read("locked.txt") == "in lock"
+
+  # withLock must not truncate existing content
+  d.write("count.txt", "41")
+  d.withLock("count.txt"):
+    let n = parseInt(d.read("count.txt"))
+    d.write("count.txt", $(n + 1))
+  check d.read("count.txt") == "42"
 
   # chmod
   d.chmod("real.txt", 0o600)

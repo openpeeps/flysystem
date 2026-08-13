@@ -149,17 +149,26 @@ method exists*(d: LocalDriver, path: string): bool =
   except CatchableError as e:
     raise newException(StorageError, "Failed to check existence of '" & path & "': " & e.msg)
 
+proc collectEntries(d: LocalDriver, full: string, res: var seq[FileMetadata]) =
+  ## Recursively collects entries, including empty directories.
+  for entry in walkDir(full):
+    res.add FileMetadata(
+      path: entry.path.relativePath(d.root),
+      size: (if entry.kind == pcFile: getFileSize(entry.path) else: 0),
+      lastModified: getLastModificationTime(entry.path),
+      isDir: entry.kind in {pcDir, pcLinkToDir})
+    if entry.kind in {pcDir, pcLinkToDir}:
+      collectEntries(d, entry.path, res)
+
 method list*(d: LocalDriver, path: string,
     recursive: static bool = false): seq[FileMetadata] =
   ## Lists files and directories at the specified path. If `recursive` is true,
-  ## it will list all files and directories recursively. Returns a sequence of FileMetadata objects.
+  ## it will list all files and directories recursively, including empty
+  ## directories. Returns a sequence of FileMetadata objects.
   let full = d.resolvePath(path)
   try:
     when recursive:
-      for entry in walkDirRec(full):
-        result.add FileMetadata(path: entry.relativePath(d.root),
-          size: getFileSize(entry), lastModified: getLastModificationTime(entry),
-          isDir: dirExists(entry))
+      collectEntries(d, full, result)
     else:
       for entry in walkDir(full):
         result.add FileMetadata(path: entry.path.relativePath(d.root),
@@ -321,19 +330,21 @@ iterator readLines*(d: LocalDriver, path: string): string =
     close(mf)
 
 method copyDir*(d: LocalDriver, src, dest: string) =
-  ## Recursively copies a directory from `src` to `dest`. Creates parent
-  ## directories if needed.
+  ## Recursively copies a directory from `src` to `dest`, including empty
+  ## directories. Creates parent directories if needed.
   let srcFull = d.resolvePath(src)
   let destFull = d.resolvePath(dest)
   try:
-    for entry in walkDirRec(srcFull):
-      let rel = entry.relativePath(srcFull)
-      if dirExists(entry):
-        createDir(destFull / rel)
+    createDir(destFull)
+    for entry in walkDir(srcFull):
+      let target = destFull / extractFilename(entry.path)
+      case entry.kind
+      of pcDir:
+        d.copyDir(entry.path, target)
+      of pcFile:
+        copyFile(entry.path, target)
       else:
-        let target = destFull / rel
-        createDir(target.parentDir)
-        copyFile(entry, target)
+        discard
   except CatchableError as e:
     raise newException(StorageError, "Failed to copy directory '" & src & "' to '" & dest & "': " & e.msg)
 
@@ -381,7 +392,7 @@ template withLock*(d: LocalDriver, path: string, body: untyped) =
   if not fileExists(full):
     createDir(full.parentDir)
     writeFile(full, "")
-  var lockFile = syncio.open(full, fmReadWrite)
+  var lockFile = syncio.open(full, fmReadWriteExisting)
   when defined(posix):
     var fl: Tflock
     fl.l_type = F_WRLCK.cshort
