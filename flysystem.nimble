@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "George Lemon"
-description   = "Multi-driver Filesystem. Atomic Writes, Policy, Locks, Multi-disks and more"
+description   = "Multi-driver Filesystem. Atomic Writes, Policy Rules, Locks, Multi-disks and more"
 license       = "MIT"
 srcDir        = "src"
 
