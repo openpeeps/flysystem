@@ -22,10 +22,8 @@
 - **Security Policies**: Wrap any driver with `FilesystemPolicy` to enforce read-only mode, size caps, extension/MIME allowlists, hidden-file denial and path limits — attachable per disk.
 - **Multi-Disk Facade**: Group several drivers under a `Filesystem` and switch between them with one call.
 
-## Install
-```sh
-nimble install flysystem
-```
+> [!NOTE]
+> Only the local filesystem driver is available today. The driver interface is ready for custom backends and cloud drivers are on the roadmap.
 
 ## 📖 Examples
 
