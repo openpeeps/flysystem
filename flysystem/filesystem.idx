@@ -1,0 +1,21 @@
+nimTitle	filesystem	flysystem/filesystem.html	module flysystem/filesystem		0
+nim	Filesystem	flysystem/filesystem.html#Filesystem	type Filesystem		16
+nim	newFilesystem	flysystem/filesystem.html#newFilesystem,string	proc newFilesystem(defaultDisk = "local"): Filesystem		24
+nim	addDisk	flysystem/filesystem.html#addDisk,Filesystem,string,StorageDriver,PolicyRules	proc addDisk(fs: Filesystem; name: string; driver: StorageDriver; policy: PolicyRules)		28
+nim	addDisk	flysystem/filesystem.html#addDisk,Filesystem,string,StorageDriver	proc addDisk(fs: Filesystem; name: string; driver: StorageDriver)		36
+nim	disk	flysystem/filesystem.html#disk,Filesystem,string	proc disk(fs: Filesystem; name = ""): StorageDriver		40
+nim	rawDisk	flysystem/filesystem.html#rawDisk,Filesystem,string	proc rawDisk(fs: Filesystem; name = ""): StorageDriver		53
+nim	diskPolicy	flysystem/filesystem.html#diskPolicy,Filesystem,string	proc diskPolicy(fs: Filesystem; name = ""): PolicyRules		61
+nim	write	flysystem/filesystem.html#write,Filesystem,string,string	proc write(fs: Filesystem; path, content: string; visibility = visPrivate)		68
+nim	read	flysystem/filesystem.html#read,Filesystem,string	proc read(fs: Filesystem; path: string): string		72
+nim	exists	flysystem/filesystem.html#exists,Filesystem,string	proc exists(fs: Filesystem; path: string): bool		76
+nim	delete	flysystem/filesystem.html#delete,Filesystem,string	proc delete(fs: Filesystem; path: string)		80
+nim	parseYaml	flysystem/filesystem.html#parseYaml.t,Filesystem,string	template parseYaml(fs: Filesystem; path: string): untyped		84
+nim	parseYaml	flysystem/filesystem.html#parseYaml.t,Filesystem,string,typedesc[T]	template parseYaml[T](fs: Filesystem; path: string; t: typedesc[T]): untyped		91
+nim	parseJson	flysystem/filesystem.html#parseJson.t,Filesystem,string	template parseJson(fs: Filesystem; path: string): untyped		99
+nim	parseJson	flysystem/filesystem.html#parseJson.t,Filesystem,string,typedesc[T]	template parseJson[T](fs: Filesystem; path: string; t: typedesc[T]): untyped		105
+nim	parseToml	flysystem/filesystem.html#parseToml.t,Filesystem,string	template parseToml(fs: Filesystem; path: string): untyped		113
+nim	parseCsv	flysystem/filesystem.html#parseCsv.t,Filesystem,string	template parseCsv(fs: Filesystem; path: string)		120
+nimgrp	adddisk	flysystem/filesystem.html#addDisk-procs-all	proc		28
+nimgrp	parsejson	flysystem/filesystem.html#parseJson-templates-all	template		99
+nimgrp	parseyaml	flysystem/filesystem.html#parseYaml-templates-all	template		84
