@@ -137,6 +137,10 @@ method delete*(d: LocalDriver, path: string) =
   let full = d.resolvePath(path)
   try:
     removeFile(full)
+  except OSError:
+    try: removeDir(full)
+    except CatchableError as e:
+      raise newException(StorageError, "Failed to delete '" & path & "': " & e.msg)
   except CatchableError as e:
     raise newException(StorageError, "Failed to delete '" & path & "': " & e.msg)
 
