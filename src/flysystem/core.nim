@@ -41,7 +41,7 @@ type
   StorageError* = object of CatchableError
 
 macro abstract*(x: untyped): untyped =
-  ## Macro-based pragma to mark methods as abstract (not implemented in the base driver).
+  ## Macro-based pragma to mark methods as abstract
   x[^3] = nnkPragma.newTree(ident"base")
   var body = newStmtList()
   add body, quote do:
