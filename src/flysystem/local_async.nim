@@ -1,7 +1,8 @@
 #
 # Async Local Driver — non-blocking counterpart to LocalDriver
 # Uses std/asyncfile + std/asyncdispatch (stdlib only, no chronos).
-# Directory / metadata / POSIX ops are wrapped synchronously inside {.async.} procs.
+# File content goes through true non-blocking IO; directory / metadata /
+# POSIX ops run synchronously inside the async methods.
 # For true non-blocking directory IO, replace with a threadpool if needed.
 
 import std/[os, strutils, options, times, asyncdispatch, asyncfile, syncio, posix]
@@ -13,13 +14,18 @@ type
   AsyncLocalDriver* = ref object of StorageDriver
     ## Async filesystem driver using an absolute runtime root
     ## (inherited from `StorageDriver`), like `LocalDriver`.
-    ## Note: only the `*Async` procs are implemented; the inherited
-    ## sync `StorageDriver` methods raise `StorageError("Not implemented")`.
+    ## Implements the same methods asynchronously — `await d.write(...)`.
+    ## Note: the inherited sync `StorageDriver` methods raise
+    ## `StorageError("Not implemented")`.
 
 # 
 # helpers (duplicated from local.nim to avoid circular import / visibility)
 # 
 proc resolvePath(d: AsyncLocalDriver, path: string): string =
+  ## Resolves a relative path against the runtime root. Absolute paths are
+  ## normalized as-is, as long as they stay inside the root.
+  ##
+  ## Prevents path traversal outside the root for security
   let resolved = normalizedPath(if isAbsolute(path): path else: d.root / path)
   if not resolved.startsWith(d.root):
     raise newException(StorageError, "Path traversal detected: " & path)
@@ -28,10 +34,14 @@ proc resolvePath(d: AsyncLocalDriver, path: string): string =
 var tmpCounter {.threadvar.}: int64
 
 proc tempPath(full: string): string =
+  ## Returns a unique temporary path in the same directory as `full`,
+  ## suitable for atomic writes.
   inc tmpCounter
   full & ".tmp" & $getCurrentProcessId() & "." & $tmpCounter
 
 proc newAsyncLocalDriver*(root: string): AsyncLocalDriver =
+  ## Creates an AsyncLocalDriver. `root` is an absolute runtime path.
+  ## Example: pass in the value of an env var or config key at startup.
   result = AsyncLocalDriver(root: expandTilde(root).absolutePath)
   if not dirExists(result.root):
     createDir(result.root)
@@ -41,6 +51,10 @@ proc newAsyncLocalDriver*(root: string): AsyncLocalDriver =
 # 
 method write*(d: AsyncLocalDriver, path, content: string,
     visibility = visPrivate): Future[void] {.base, async.} =
+  ## Asynchronously writes `content` to the file at `path`. The write is
+  ## atomic: content is first written to a temporary file in the same
+  ## directory and then renamed over the target, so a crash mid-write
+  ## never corrupts the file.
   let full = d.resolvePath(path)
   try:
     createDir(full.parentDir)
@@ -62,6 +76,9 @@ method write*(d: AsyncLocalDriver, path, content: string,
     raise newException(StorageError, "Failed to write '" & path & "': " & e.msg)
 
 method read*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} =
+  ## Asynchronously reads a file from the local filesystem at the specified path.
+  ##
+  ## The path is resolved against the driver's root directory.
   let full = d.resolvePath(path)
   try:
     let f = openAsync(full, fmRead)
@@ -72,6 +89,8 @@ method read*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} 
     raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
 
 method append*(d: AsyncLocalDriver, path, content: string): Future[void] {.base, async.} =
+  ## Asynchronously appends `content` to the file at the specified path.
+  ## Creates the file (and parent directories) if it does not exist yet.
   let full = d.resolvePath(path)
   try:
     createDir(full.parentDir)
@@ -85,6 +104,10 @@ method append*(d: AsyncLocalDriver, path, content: string): Future[void] {.base,
     raise newException(StorageError, "Failed to append to '" & path & "': " & e.msg)
 
 method writeStream*(d: AsyncLocalDriver, path: string, src: File): Future[void] {.base, async.} =
+  ## Streams the contents of an open file handle `src` to the specified path
+  ## without blocking the event loop. Parent directories are created if needed.
+  ## The write is atomic. Note: chunk reads from the caller-provided `src`
+  ## handle are synchronous; destination writes are awaited.
   let full = d.resolvePath(path)
   try:
     createDir(full.parentDir)
@@ -105,6 +128,10 @@ method writeStream*(d: AsyncLocalDriver, path: string, src: File): Future[void] 
     raise newException(StorageError, "Failed to write stream '" & path & "': " & e.msg)
 
 method appendStream*(d: AsyncLocalDriver, path: string, src: File): Future[void] {.base, async.} =
+  ## Appends the contents of an open file handle `src` to the file at the
+  ## specified path without blocking the event loop. Creates the file (and
+  ## parent directories) if it does not exist yet. Note: chunk reads from the
+  ## caller-provided `src` handle are synchronous; destination writes are awaited.
   let full = d.resolvePath(path)
   try:
     createDir(full.parentDir)
@@ -122,7 +149,7 @@ method appendStream*(d: AsyncLocalDriver, path: string, src: File): Future[void]
     raise newException(StorageError, "Failed to append stream to '" & path & "': " & e.msg)
 
 method readStream*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} =
-  ## Async equivalent of readStream — reads fully via asyncfile.
+  ## Asynchronously reads the whole file via asyncfile and returns its content.
   ## For memmap-style access, use the sync LocalDriver.readStream.
   return await d.read(path)
 
@@ -130,6 +157,8 @@ method readStream*(d: AsyncLocalDriver, path: string): Future[string] {.base, as
 # metadata / filesystem — wrapped sync (blocking) but inside async proc
 # 
 method metadata*(d: AsyncLocalDriver, path: string): Future[FileMetadata] {.base, async.} =
+  ## Retrieves metadata for a file or directory at the specified path,
+  ## including size, last modified time, and whether it's a directory.
   let full = d.resolvePath(path)
   try:
     result = FileMetadata(
@@ -143,24 +172,31 @@ method metadata*(d: AsyncLocalDriver, path: string): Future[FileMetadata] {.base
     raise newException(StorageError, "Failed to retrieve metadata of '" & path & "': " & e.msg)
 
 method size*(d: AsyncLocalDriver, path: string): Future[int64] {.base, async.} =
+  ## Returns the size in bytes — reuses `metadata` internally.
   let m = await d.metadata(path)
   return m.size
 
 method lastModified*(d: AsyncLocalDriver, path: string): Future[times.Time] {.base, async.} =
+  ## Returns the last modification time — reuses `metadata` internally.
   let m = await d.metadata(path)
   return m.lastModified
 
 method checksum*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} =
+  ## Returns the MD5 checksum of the file at the specified path.
   let content = await d.read(path)
   return getMD5(content)
 
 method mimeType*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} =
+  ## Returns the MIME type of the file at the specified path, inferred from
+  ## its file extension via the `mimedb` database.
   let ext = splitFile(path).ext
   if ext.len == 0:
     return "application/octet-stream"
   return getMimeType(ext[1..^1]).get("application/octet-stream")
 
 method exists*(d: AsyncLocalDriver, path: string): Future[bool] {.base, async.} =
+  ## Checks if a file or directory exists at the specified path on the
+  ## local filesystem.
   let full = d.resolvePath(path)
   try:
     return fileExists(full) or dirExists(full)
@@ -168,6 +204,9 @@ method exists*(d: AsyncLocalDriver, path: string): Future[bool] {.base, async.} 
     raise newException(StorageError, "Failed to check existence of '" & path & "': " & e.msg)
 
 method delete*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.} =
+  ## Deletes a file from the local filesystem at the specified path.
+  ##
+  ## The path is resolved against the driver's root directory.
   let full = d.resolvePath(path)
   try:
     removeFile(full)
@@ -179,6 +218,8 @@ method delete*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.} 
     raise newException(StorageError, "Failed to delete '" & path & "': " & e.msg)
 
 method makeDir*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.} =
+  ## Creates a directory at the specified path. Creates parent
+  ## directories if needed.
   let full = d.resolvePath(path)
   try:
     createDir(full)
@@ -186,6 +227,9 @@ method makeDir*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.}
     raise newException(StorageError, "Failed to create directory '" & path & "': " & e.msg)
 
 method deleteDir*(d: AsyncLocalDriver, path: string, force = false): Future[void] {.base, async.} =
+  ## Deletes a directory at the specified path. If `force` is false, only an
+  ## empty directory can be deleted; otherwise a `StorageError` is raised.
+  ## If `force` is true, the directory is deleted recursively.
   let full = d.resolvePath(path)
   try:
     if force:
@@ -200,6 +244,8 @@ method deleteDir*(d: AsyncLocalDriver, path: string, force = false): Future[void
     raise newException(StorageError, "Failed to delete directory '" & path & "': " & e.msg)
 
 method touch*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.} =
+  ## Creates an empty file at `path` if it does not exist, or updates its
+  ## last-modified time. Never truncates an existing file.
   let full = d.resolvePath(path)
   try:
     createDir(full.parentDir)
@@ -213,6 +259,8 @@ method touch*(d: AsyncLocalDriver, path: string): Future[void] {.base, async.} =
     raise newException(StorageError, "Failed to touch '" & path & "': " & e.msg)
 
 method setVisibility*(d: AsyncLocalDriver, path: string, visibility: Visibility): Future[void] {.base, async.} =
+  ## Sets the file visibility. `visPublic` maps to world-readable permissions
+  ## (0o644), `visPrivate` to user-only (0o600).
   let full = d.resolvePath(path)
   let perms =
     if visibility == visPublic: {fpUserRead, fpUserWrite, fpGroupRead, fpOthersRead}
@@ -223,6 +271,8 @@ method setVisibility*(d: AsyncLocalDriver, path: string, visibility: Visibility)
     raise newException(StorageError, "Failed to set visibility of '" & path & "': " & e.msg)
 
 method visibility*(d: AsyncLocalDriver, path: string): Future[Visibility] {.base, async.} =
+  ## Returns the visibility of the file at the specified path, based on
+  ## its actual filesystem permissions.
   let full = d.resolvePath(path)
   try:
     return if fpOthersRead in getFilePermissions(full): visPublic else: visPrivate
@@ -230,6 +280,7 @@ method visibility*(d: AsyncLocalDriver, path: string): Future[Visibility] {.base
     raise newException(StorageError, "Failed to get visibility of '" & path & "': " & e.msg)
 
 proc collectEntries(d: AsyncLocalDriver, full: string, res: var seq[FileMetadata]) =
+  ## Recursively collects entries, including empty directories.
   for entry in walkDir(full):
     res.add FileMetadata(
       path: entry.path.relativePath(d.root),
@@ -240,6 +291,9 @@ proc collectEntries(d: AsyncLocalDriver, full: string, res: var seq[FileMetadata
       collectEntries(d, entry.path, res)
 
 method list*(d: AsyncLocalDriver, path: string, recursive = false): Future[seq[FileMetadata]] {.base, async.} =
+  ## Lists files and directories at the specified path. If `recursive` is true,
+  ## it will list all files and directories recursively, including empty
+  ## directories. Returns a sequence of FileMetadata objects.
   let full = d.resolvePath(path)
   try:
     if recursive:
@@ -259,6 +313,9 @@ method list*(d: AsyncLocalDriver, path: string, recursive = false): Future[seq[F
     raise newException(StorageError, "Failed to list '" & path & "': " & e.msg)
 
 method move*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async.} =
+  ## Moves a file from `src` to `dest` on the local filesystem.
+  ##
+  ## Creates parent directories if needed.
   let srcFull = d.resolvePath(src)
   let destFull = d.resolvePath(dest)
   try:
@@ -268,6 +325,9 @@ method move*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async
     raise newException(StorageError, "Failed to move '" & src & "' to '" & dest & "': " & e.msg)
 
 method copy*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async.} =
+  ## Copies a file from `src` to `dest` on the local filesystem.
+  ##
+  ## Creates parent directories if needed.
   let srcFull = d.resolvePath(src)
   let destFull = d.resolvePath(dest)
   try:
@@ -277,6 +337,8 @@ method copy*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async
     raise newException(StorageError, "Failed to copy '" & src & "' to '" & dest & "': " & e.msg)
 
 method copyDir*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async.} =
+  ## Recursively copies a directory from `src` to `dest`, including empty
+  ## directories. Creates parent directories if needed.
   let srcFull = d.resolvePath(src)
   let destFull = d.resolvePath(dest)
   try:
@@ -292,6 +354,8 @@ method copyDir*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, as
     raise newException(StorageError, "Failed to copy directory '" & src & "' to '" & dest & "': " & e.msg)
 
 method moveDir*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, async.} =
+  ## Moves a directory from `src` to `dest`. Creates parent directories if
+  ## needed.
   let srcFull = d.resolvePath(src)
   let destFull = d.resolvePath(dest)
   try:
@@ -301,6 +365,8 @@ method moveDir*(d: AsyncLocalDriver, src, dest: string): Future[void] {.base, as
     raise newException(StorageError, "Failed to move directory '" & src & "' to '" & dest & "': " & e.msg)
 
 method search*(d: AsyncLocalDriver, pattern: string): Future[seq[string]] {.base, async.} =
+  ## Returns paths (relative to the root) matching the glob `pattern`,
+  ## e.g. `"*.txt"` or `"sub/*.log"`.
   let (dir, name) = splitPath(pattern)
   let base = if dir.len == 0: d.root else: d.resolvePath(dir)
   try:
@@ -313,6 +379,8 @@ method search*(d: AsyncLocalDriver, pattern: string): Future[seq[string]] {.base
     raise newException(StorageError, "Failed to search '" & pattern & "': " & e.msg)
 
 method createSymlink*(d: AsyncLocalDriver, path, target: string): Future[void] {.base, async.} =
+  ## Creates a symbolic link at `path` pointing to `target`. `target` must
+  ## resolve inside the driver root.
   let link = d.resolvePath(path)
   let dest = d.resolvePath(target)
   try:
@@ -321,6 +389,7 @@ method createSymlink*(d: AsyncLocalDriver, path, target: string): Future[void] {
     raise newException(StorageError, "Failed to create symlink '" & path & "' -> '" & target & "': " & e.msg)
 
 method isSymlink*(d: AsyncLocalDriver, path: string): Future[bool] {.base, async.} =
+  ## Returns true if the file at `path` is a symbolic link.
   let full = d.resolvePath(path)
   try:
     return symlinkExists(full)
@@ -328,6 +397,7 @@ method isSymlink*(d: AsyncLocalDriver, path: string): Future[bool] {.base, async
     raise newException(StorageError, "Failed to check symlink '" & path & "': " & e.msg)
 
 method readLink*(d: AsyncLocalDriver, path: string): Future[string] {.base, async.} =
+  ## Returns the target of the symbolic link at `path`, relative to the root.
   let full = d.resolvePath(path)
   try:
     return expandSymlink(full).relativePath(d.root)
@@ -335,6 +405,8 @@ method readLink*(d: AsyncLocalDriver, path: string): Future[string] {.base, asyn
     raise newException(StorageError, "Failed to read symlink '" & path & "': " & e.msg)
 
 method diskUsage*(d: AsyncLocalDriver): Future[tuple[total, free, used: int64]] {.base, async.} =
+  ## Returns the total, free and used bytes on the filesystem containing the
+  ## driver root. POSIX-only.
   when defined(posix):
     var vfs: Statvfs
     if statvfs(d.root.cstring, vfs) != 0:
@@ -346,6 +418,8 @@ method diskUsage*(d: AsyncLocalDriver): Future[tuple[total, free, used: int64]] 
     raise newException(StorageError, "diskUsage is only supported on POSIX")
 
 method chmod*(d: AsyncLocalDriver, path: string, mode: int): Future[void] {.base, async.} =
+  ## Sets the file permission bits of `path` to `mode` (e.g. 0o644).
+  ## POSIX-only.
   let full = d.resolvePath(path)
   when defined(posix):
     if chmod(full.cstring, Mode(mode)) != 0:
@@ -354,6 +428,7 @@ method chmod*(d: AsyncLocalDriver, path: string, mode: int): Future[void] {.base
     raise newException(StorageError, "chmod is only supported on POSIX")
 
 method chown*(d: AsyncLocalDriver, path: string, uid, gid: int): Future[void] {.base, async.} =
+  ## Changes the owner and group of the file at `path`. POSIX-only.
   let full = d.resolvePath(path)
   when defined(posix):
     if chown(full.cstring, Uid(uid), Gid(gid)) != 0:
@@ -362,7 +437,9 @@ method chown*(d: AsyncLocalDriver, path: string, uid, gid: int): Future[void] {.
     raise newException(StorageError, "chown is only supported on POSIX")
 
 method readLines*(d: AsyncLocalDriver, path: string): Future[seq[string]] {.base, async.} =
-  ## Async counterpart to readLines iterator — returns all lines.
+  ## Returns all lines of the file at `path`, read asynchronously.
+  ## Behaves like the sync `readLines` iterator (handles `\n` and `\r\n`,
+  ## no trailing empty line) but returns a sequence instead of yielding.
   let content = await d.read(path)
   if content.len == 0: return @[]
   # splitLines handles \n and \r\n; we mimic iterator behaviour (no trailing empty)
