@@ -5,7 +5,11 @@
 # (c) 2026 George Lemon | MIT License
 #     Made by Humans from OpenPeeps
 #     https://github.com/openpeeps/flysystem
-import std/[os, strutils, memfiles, options, times, syncio, posix]
+import std/[os, strutils, options, times, syncio, posix]
+when defined(features.flysystem.useStdStreams):
+  import std/streams
+else:
+  import std/memfiles
 import pkg/mimedb
 import checksums/md5
 import ./core
@@ -72,19 +76,25 @@ method read*(d: LocalDriver, path: string): string =
   except CatchableError as e:
     raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
 
-method readStream*(d: LocalDriver, path: string): MemFile =
-  ## Efficiently reads a file as a stream using memfiles, which allows
-  ## for handling large files without loading them entirely into memory.
-  ## An empty file yields a MemFile with `size == 0` and `mem == nil`, which
-  ## holds no resources and does not need to be `close`d.
+method readStream*(d: LocalDriver, path: string): FlysystemStream =
+  ## Efficiently reads a file as a stream.
+  ## Default backend uses memfiles (mmap); with `-d:features.flysystem.useStdStreams`
+  ## it returns a `Stream` (`FileStream`). An empty file with the mmap backend
+  ## yields a `MemFile` with `size == 0`/`mem == nil` that does not need `close`.
+  ## With streams, the returned `Stream` must always be closed, even for empty files.
   let full = d.resolvePath(path)
   try:
-    if getFileSize(full) > 0:
-      result = memfiles.open(full, fmRead)
+    when defined(features.flysystem.useStdStreams):
+      result = newFileStream(full, fmRead)
+      if result == nil:
+        raise newException(IOError, "cannot open stream: " & full)
     else:
-      result = default(MemFile)
-      when not defined(windows):
-        result.handle = -1
+      if getFileSize(full) > 0:
+        result = memfiles.open(full, fmRead)
+      else:
+        result = default(MemFile)
+        when not defined(windows):
+          result.handle = -1
   except CatchableError as e:
     raise newException(StorageError, "Failed to read stream '" & path & "': " & e.msg)
 
@@ -272,20 +282,12 @@ method metadata*(d: LocalDriver, path: string): FileMetadata =
     raise newException(StorageError, "Failed to retrieve metadata of '" & path & "': " & e.msg)
 
 method size*(d: LocalDriver, path: string): int64 =
-  ## Returns the size in bytes of the file at the specified path.
-  let full = d.resolvePath(path)
-  try:
-    getFileSize(full)
-  except CatchableError as e:
-    raise newException(StorageError, "Failed to get size of '" & path & "': " & e.msg)
+  ## Returns the size in bytes — reuses `metadata` internally.
+  d.metadata(path).size
 
 method lastModified*(d: LocalDriver, path: string): times.Time =
-  ## Returns the last modification time of the file at the specified path.
-  let full = d.resolvePath(path)
-  try:
-    getLastModificationTime(full)
-  except CatchableError as e:
-    raise newException(StorageError, "Failed to get last modified time of '" & path & "': " & e.msg)
+  ## Returns the last modification time — reuses `metadata` internally.
+  d.metadata(path).lastModified
 
 method checksum*(d: LocalDriver, path: string): string =
   ## Returns the MD5 checksum of the file at the specified path.
@@ -312,7 +314,9 @@ method touch*(d: LocalDriver, path: string) =
     raise newException(StorageError, "Failed to touch '" & path & "': " & e.msg)
 
 iterator readLines*(d: LocalDriver, path: string): string =
-  ## Iterates over the lines of the file at `path` using a memory-mapped read.
+  ## Iterates over the lines of the file at `path`.
+  ## Default backend uses a memory-mapped read; with
+  ## `-d:features.flysystem.useStdStreams` it uses `FileStream`.
   ## A single internal buffer is reused across lines, so no per-line allocations
   ## happen. The yielded string is only valid until the next iteration — copy it
   ## if you need to keep it.
@@ -323,15 +327,28 @@ iterator readLines*(d: LocalDriver, path: string): string =
   except CatchableError as e:
     raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
   if size > 0:
-    var mf: MemFile
-    try:
-      mf = memfiles.open(full, fmRead)
-    except CatchableError as e:
-      raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
-    var buf = newString(0)
-    for line in lines(mf, buf):
-      yield line
-    close(mf)
+    when defined(features.flysystem.useStdStreams):
+      var s: FileStream
+      try:
+        s = newFileStream(full, fmRead)
+        if s == nil:
+          raise newException(IOError, "cannot open: " & full)
+      except CatchableError as e:
+        raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
+      var buf = newString(0)
+      while s.readLine(buf):
+        yield buf
+      s.close()
+    else:
+      var mf: MemFile
+      try:
+        mf = memfiles.open(full, fmRead)
+      except CatchableError as e:
+        raise newException(StorageError, "Failed to read '" & path & "': " & e.msg)
+      var buf = newString(0)
+      for line in lines(mf, buf):
+        yield line
+      close(mf)
 
 method copyDir*(d: LocalDriver, src, dest: string) =
   ## Recursively copies a directory from `src` to `dest`, including empty
@@ -363,7 +380,7 @@ method moveDir*(d: LocalDriver, src, dest: string) =
   except CatchableError as e:
     raise newException(StorageError, "Failed to move directory '" & src & "' to '" & dest & "': " & e.msg)
 
-method createSymlink*(d: LocalDriver, path, target: string) =
+method createSymlink*(d: LocalDriver, path, target: string) {.base.} =
   ## Creates a symbolic link at `path` pointing to `target`. `target` must
   ## resolve inside the driver root.
   let link = d.resolvePath(path)
@@ -373,7 +390,7 @@ method createSymlink*(d: LocalDriver, path, target: string) =
   except CatchableError as e:
     raise newException(StorageError, "Failed to create symlink '" & path & "' -> '" & target & "': " & e.msg)
 
-method isSymlink*(d: LocalDriver, path: string): bool =
+method isSymlink*(d: LocalDriver, path: string): bool {.base.} =
   ## Returns true if the file at `path` is a symbolic link.
   let full = d.resolvePath(path)
   try:
@@ -381,7 +398,7 @@ method isSymlink*(d: LocalDriver, path: string): bool =
   except CatchableError as e:
     raise newException(StorageError, "Failed to check symlink '" & path & "': " & e.msg)
 
-method readLink*(d: LocalDriver, path: string): string =
+method readLink*(d: LocalDriver, path: string): string {.base.} =
   ## Returns the target of the symbolic link at `path`, relative to the root.
   let full = d.resolvePath(path)
   try:
@@ -427,7 +444,65 @@ method search*(d: LocalDriver, pattern: string): seq[string] =
   except CatchableError as e:
     raise newException(StorageError, "Failed to search '" & pattern & "': " & e.msg)
 
-method diskUsage*(d: LocalDriver): tuple[total, free, used: int64] =
+method copyFromHost*(d: LocalDriver, srcAbs, destRel: string) {.base.} =
+  ## Copy a file or directory from an absolute host path `srcAbs`
+  ## (outside the driver root, e.g. a project readonly disk) into
+  ## the driver at `destRel`. Used for `clue install` (local) which
+  ## copies from the project disk to the clue disk.
+  let destFull = d.resolvePath(destRel)
+  let src = srcAbs.expandTilde.absolutePath
+  try:
+    if dirExists(src):
+      createDir(destFull)
+      for entry in walkDir(src):
+        let target = destFull / extractFilename(entry.path)
+        case entry.kind
+        of pcDir:
+          copyDir(entry.path, target)
+        of pcFile:
+          copyFile(entry.path, target)
+        else: discard
+    elif fileExists(src):
+      createDir(destFull.parentDir)
+      copyFile(src, destFull)
+    else:
+      raise newException(StorageError, "Source not found: " & srcAbs)
+  except StorageError: raise
+  except CatchableError as e:
+    raise newException(StorageError,
+      "Failed to copyFromHost '" & srcAbs & "' -> '" & destRel & "': " & e.msg)
+
+method importFrom*(d: LocalDriver, srcDriver: StorageDriver,
+                   srcRel, destRel: string) {.base.} =
+  ## Copy between two drivers (e.g. project readonly disk -> clue disk).
+  ## `srcRel` is relative to `srcDriver.root`, `destRel` to `d.root`.
+  let srcFull =
+    if srcDriver of LocalDriver: LocalDriver(srcDriver).resolvePath(srcRel)
+    elif srcRel.isAbsolute: srcRel
+    else: srcDriver.root / srcRel
+  let destFull = d.resolvePath(destRel)
+  try:
+    if dirExists(srcFull):
+      createDir(destFull)
+      for entry in walkDir(srcFull):
+        let target = destFull / extractFilename(entry.path)
+        case entry.kind
+        of pcDir:
+          copyDir(entry.path, target)
+        of pcFile:
+          copyFile(entry.path, target)
+        else: discard
+    elif fileExists(srcFull):
+      createDir(destFull.parentDir)
+      copyFile(srcFull, destFull)
+    else:
+      raise newException(StorageError, "Source not found: " & srcRel)
+  except StorageError: raise
+  except CatchableError as e:
+    raise newException(StorageError,
+      "Failed to importFrom '" & srcRel & "' -> '" & destRel & "': " & e.msg)
+
+method diskUsage*(d: LocalDriver): tuple[total, free, used: int64] {.base.} =
   ## Returns the total, free and used bytes on the filesystem containing the
   ## driver root. POSIX-only.
   when defined(posix):
@@ -441,7 +516,7 @@ method diskUsage*(d: LocalDriver): tuple[total, free, used: int64] =
   else:
     raise newException(StorageError, "diskUsage is only supported on POSIX")
 
-method chmod*(d: LocalDriver, path: string, mode: int) =
+method chmod*(d: LocalDriver, path: string, mode: int) {.base.} =
   ## Sets the file permission bits of `path` to `mode` (e.g. 0o644).
   ## POSIX-only.
   let full = d.resolvePath(path)
@@ -451,7 +526,7 @@ method chmod*(d: LocalDriver, path: string, mode: int) =
   else:
     raise newException(StorageError, "chmod is only supported on POSIX")
 
-method chown*(d: LocalDriver, path: string, uid, gid: int) =
+method chown*(d: LocalDriver, path: string, uid, gid: int) {.base.} =
   ## Changes the owner and group of the file at `path`. POSIX-only.
   let full = d.resolvePath(path)
   when defined(posix):

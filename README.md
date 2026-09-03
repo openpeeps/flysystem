@@ -17,7 +17,8 @@
 - **Rich Metadata**: Retrieve detailed file metadata, including size, last modified time, visibility, checksum and MIME type.
 - **Preventing Directory Traversal**: All file operations are securely sandboxed to prevent access outside the designated root directory, mitigating directory traversal vulnerabilities.
 - **Atomic Writes**: Content is written to a temporary file and renamed over the target, so a crash mid-write never corrupts a file.
-- **Memory-Efficient**: Handle large files without loading them entirely into memory via `MemFiles`, including a zero-allocation `readLines` iterator.
+- **Memory-Efficient**: Handle large files without loading them entirely into memory via `MemFiles`, including a zero-allocation `readLines` iterator. Swap in `std/streams` with `-d:features.flysystem.useStdStreams`.
+- **Async Driver**: Opt-in `AsyncLocalDriver` implementing the same methods asynchronously (`await d.write(...)`) on stdlib `asyncfile`/`asyncdispatch` — no extra dependencies.
 - **POSIX Tooling**: Symlinks, advisory file locking, `chmod`/`chown` and `statvfs`-based disk-usage helpers.
 - **Security Policies**: Wrap any driver with `FilesystemPolicy` to enforce read-only mode, size caps, extension/MIME allowlists, hidden-file denial and path limits — attachable per disk.
 - **Multi-Disk Facade**: Group several drivers under a `Filesystem` and switch between them with one call.
@@ -98,8 +99,8 @@ echo m.size                        # 9
 echo m.lastModified                # Time
 echo m.isDir                       # false
 
-echo d.size("notes.txt")           # 9 (int64)
-echo d.lastModified("notes.txt")   # Time
+echo d.size("notes.txt")           # 9 (int64, via metadata)
+echo d.lastModified("notes.txt")   # Time (via metadata)
 echo d.checksum("notes.txt")       # "e194f103..." (md5 hex)
 echo d.mimeType("notes.txt")       # "text/plain"
 
@@ -128,6 +129,12 @@ src.close()
 var mf = d.readStream("stored.bin")
 echo mf.size
 defer: mf.close()
+
+# ...or with std/streams instead of memfiles (compile with
+# -d:features.flysystem.useStdStreams, e.g. nimble testStreams):
+# var s = d.readStream("stored.bin")
+# echo s.readAll()
+# s.close()   # always required, even for empty files
 ```
 
 ### Reading lines (zero-allocation)
@@ -169,6 +176,25 @@ let du = d.diskUsage()          # POSIX-only
 echo "free: ", du.free, " bytes of ", du.total
 ```
 
+### Async driver (stdlib only)
+```nim
+import std/asyncdispatch
+import flysystem/local_async   # opt-in, alongside `import flysystem`
+
+let ad = newAsyncLocalDriver("/srv/storage")
+
+proc main() {.async.} =
+  await ad.write("hello.txt", "hi")
+  echo await ad.read("hello.txt")      # "hi"
+  echo await ad.size("hello.txt")      # 2 (via metadata)
+  echo await ad.readLines("log.txt")   # @["line1", "line2"]
+  await ad.copyDir("assets", "backup")
+
+waitFor main()
+```
+File content goes through true non-blocking `std/asyncfile`; directory,
+metadata and POSIX helpers run synchronously inside the `async` methods.
+
 ### Multi-disk Filesystem facade
 ```nim
 let fs = newFilesystem()
@@ -204,7 +230,7 @@ except StorageError as e:
 import flysystem
 
 # a policy layer wraps any driver and rejects violating operations
-# with a PolicyError (a subtype of StorageError)
+# with a FilesystemPolicyError (a subtype of StorageError)
 let d = newLocalDriver("/srv/uploads")
 
 let rules = PolicyRules(
@@ -220,7 +246,7 @@ let secure = newFilesystemPolicy(d, rules)
 
 try:
   secure.write("evil.exe", "...")  # blocked by allowedExtensions
-except PolicyError as e:
+except FilesystemPolicyError as e:
   echo e.rule          # "allowedExtensions"
   echo e.operation     # "write"
 
@@ -230,7 +256,7 @@ fs.addDisk("uploads", d, rules)
 fs.disk("uploads").write("photo.jpg", "...")   # ok
 try:
   fs.disk("uploads").write("payload.bin", "...")  # blocked
-except PolicyError as e:
+except FilesystemPolicyError as e:
   echo e.rule           # "allowedExtensions" (".bin" is not allowlisted)
 
 # bypass the policy when you really need the raw driver

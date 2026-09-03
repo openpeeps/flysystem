@@ -1,5 +1,9 @@
 import unittest
-import os, strutils, memfiles
+import os, strutils
+when defined(features.flysystem.useStdStreams):
+  import std/streams
+else:
+  import std/memfiles
 import std/syncio
 import checksums/md5
 import flysystem
@@ -47,9 +51,14 @@ test "policy passes through with default rules":
   check p.list("", recursive = true).len > 0
 
   # readStream through the policy
-  var mf = p.readStream("a.txt")
-  check mf.size == 6
-  close(mf)
+  when defined(features.flysystem.useStdStreams):
+    var ps = p.readStream("a.txt")
+    check ps.readAll() == "hello!"
+    ps.close()
+  else:
+    var mf = p.readStream("a.txt")
+    check mf.size == 6
+    close(mf)
   p.deleteDir("sub", force = true)
   check not p.exists("sub")
 
@@ -76,8 +85,8 @@ test "readOnly policy":
              proc(): void = p.setVisibility("data.txt", visPublic)]:
     try:
       op()
-      assert false, "Expected PolicyError for read-only operation"
-    except PolicyError as e:
+      assert false, "Expected FilesystemPolicyError for read-only operation"
+    except FilesystemPolicyError as e:
       check e.rule == "readOnly"
       check e.operation.len > 0
 
@@ -94,15 +103,15 @@ test "maxFileSize policy":
 
   try:
     p.write("big.txt", "12345678901")
-    assert false, "Expected PolicyError for oversized write"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for oversized write"
+  except FilesystemPolicyError as e:
     check e.rule == "maxFileSize"
 
   # append beyond the cap
   try:
     p.append("ok.txt", "123456")
-    assert false, "Expected PolicyError for oversized append"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for oversized append"
+  except FilesystemPolicyError as e:
     check e.rule == "maxFileSize"
 
   # writeStream beyond the cap
@@ -110,8 +119,8 @@ test "maxFileSize policy":
   var src = syncio.open(root / "src.big", fmRead)
   try:
     p.writeStream("streamed.bin", src)
-    assert false, "Expected PolicyError for oversized writeStream"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for oversized writeStream"
+  except FilesystemPolicyError as e:
     check e.rule == "maxFileSize"
   src.close()
 
@@ -130,35 +139,35 @@ test "allowedExtensions and allowedMimeTypes policies":
 
   try:
     p.write("evil.exe", "nope")
-    assert false, "Expected PolicyError for disallowed extension"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for disallowed extension"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedExtensions"
 
   # ".bin" is allowed by extension but not by mime type
   try:
     p.write("binary.bin", "nope")
-    assert false, "Expected PolicyError for disallowed mime type"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for disallowed mime type"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedMimeTypes"
 
   # move/copy targets are checked too
   try:
     p.copy("ok.txt", "evil.exe")
-    assert false, "Expected PolicyError for disallowed extension on copy"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for disallowed extension on copy"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedExtensions"
 
   try:
     p.move("ok.txt", "renamed.bin")
-    assert false, "Expected PolicyError for disallowed mime type on move"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for disallowed mime type on move"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedMimeTypes"
 
   # file without an extension is not allowed when an allowlist is set
   try:
     p.write("noext", "x")
-    assert false, "Expected PolicyError for missing extension"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for missing extension"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedExtensions"
 
   # copyDir rejects a tree containing a disallowed file up-front
@@ -167,8 +176,8 @@ test "allowedExtensions and allowedMimeTypes policies":
   d.write("src/bad.exe", "b")
   try:
     p.copyDir("src", "dst")
-    assert false, "Expected PolicyError for disallowed file inside copied tree"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for disallowed file inside copied tree"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedExtensions"
   check not d.exists("dst")
 
@@ -185,14 +194,14 @@ test "denyHiddenFiles blocks and filters":
 
   try:
     p.write(".hidden.txt", "nope")
-    assert false, "Expected PolicyError for hidden file"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for hidden file"
+  except FilesystemPolicyError as e:
     check e.rule == "denyHiddenFiles"
 
   try:
     p.makeDir(".cache")
-    assert false, "Expected PolicyError for hidden directory"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for hidden directory"
+  except FilesystemPolicyError as e:
     check e.rule == "denyHiddenFiles"
 
   # hidden files are filtered out of listings
@@ -219,15 +228,15 @@ test "maxPathLength and maxDepth policies":
   p.write("short.txt", "x")
   try:
     p.write("way_too_long_filename.txt", "x")
-    assert false, "Expected PolicyError for too-long path"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for too-long path"
+  except FilesystemPolicyError as e:
     check e.rule == "maxPathLength"
 
   p.write("a/b.txt", "x")
   try:
     p.write("a/b/c.txt", "x")
-    assert false, "Expected PolicyError for too-deep path"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError for too-deep path"
+  except FilesystemPolicyError as e:
     check e.rule == "maxDepth"
 
   if dirExists(root):
@@ -242,7 +251,7 @@ test "policy error is a StorageError":
     p.write("x.txt", "x")
     assert false, "Expected StorageError"
   except StorageError as e:
-    check e of PolicyError
+    check e of FilesystemPolicyError
 
   if dirExists(root):
     removeDir(root)
@@ -258,8 +267,8 @@ test "policy attached to a Filesystem disk":
   fs.disk("secure").write("ok.txt", "fine")
   try:
     fs.disk("secure").write("bad.exe", "nope")
-    assert false, "Expected PolicyError through the facade"
-  except PolicyError as e:
+    assert false, "Expected FilesystemPolicyError through the facade"
+  except FilesystemPolicyError as e:
     check e.rule == "allowedExtensions"
 
   # the default-policy disk returns the raw driver

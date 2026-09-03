@@ -5,12 +5,12 @@
 # (c) 2026 George Lemon | MIT License
 #     Made by Humans from OpenPeeps
 #     https://github.com/openpeeps/flysystem
-import std/[os, strutils, options, times, memfiles]
+import std/[os, strutils, options, times]
 import pkg/mimedb
 import ./core
 
 type
-  PolicyError* = object of StorageError
+  FilesystemPolicyError* = object of StorageError
     ## Raised when an operation violates a filesystem policy. Carries the
     ## offending `operation` and the `rule` that was violated.
     operation*: string
@@ -38,7 +38,7 @@ type
   FilesystemPolicy* = ref object of StorageDriver
     ## A security layer wrapping an underlying `StorageDriver`. Every
     ## operation is checked against a set of `PolicyRules` before being
-    ## delegated, and violations raise a `PolicyError`.
+    ## delegated, and violations raise a `FilesystemPolicyError`.
     inner: StorageDriver
     rules: PolicyRules
 
@@ -60,7 +60,7 @@ proc rules*(p: FilesystemPolicy): PolicyRules =
   p.rules
 
 proc policyError(operation, rule, detail: string) {.noReturn.} =
-  var e = newException(PolicyError,
+  var e = newException(FilesystemPolicyError,
     "policy violation [" & rule & "]: " & operation & " " & detail)
   e.operation = operation
   e.rule = rule
@@ -132,7 +132,7 @@ method read*(p: FilesystemPolicy, path: string): string =
   p.checkPath("read", path)
   p.inner.read(path)
 
-method readStream*(p: FilesystemPolicy, path: string): MemFile =
+method readStream*(p: FilesystemPolicy, path: string): FlysystemStream =
   p.checkPath("readStream", path)
   p.inner.readStream(path)
 

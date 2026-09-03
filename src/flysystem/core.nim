@@ -6,7 +6,14 @@
 #     Made by Humans from OpenPeeps
 #     https://github.com/openpeeps/flysystem
 
-import std/[macros, memfiles, times]
+import std/[macros, times]
+
+when defined(features.flysystem.useStdStreams):
+  import std/streams
+  type FlysystemStream* = Stream
+else:
+  import std/memfiles
+  type FlysystemStream* = MemFile
 
 type        
   Visibility* = enum
@@ -54,7 +61,7 @@ macro abstract*(x: untyped): untyped =
 #
 method write*(d: StorageDriver, path, content: string, visibility = visPrivate) {.abstract.}
 method read*(d: StorageDriver, path: string): string {.abstract.}
-method readStream*(d: StorageDriver, path: string): MemFile {.abstract.}
+method readStream*(d: StorageDriver, path: string): FlysystemStream {.abstract.}
 method delete*(d: StorageDriver, path: string) {.abstract.}
 method exists*(d: StorageDriver, path: string): bool {.abstract.}
 method list*(d: StorageDriver, path: string, recursive = false): seq[FileMetadata] {.abstract.}
@@ -69,8 +76,12 @@ method search*(d: StorageDriver, pattern: string): seq[string] {.abstract.}
 method setVisibility*(d: StorageDriver, path: string, visibility: Visibility) {.abstract.}
 method visibility*(d: StorageDriver, path: string): Visibility {.abstract.}
 method metadata*(d: StorageDriver, path: string): FileMetadata {.abstract.}
-method size*(d: StorageDriver, path: string): int64 {.abstract.}
-method lastModified*(d: StorageDriver, path: string): Time {.abstract.}
+method size*(d: StorageDriver, path: string): int64 {.base.} =
+  ## Default implementation via `metadata` — drivers may override for efficiency.
+  d.metadata(path).size
+method lastModified*(d: StorageDriver, path: string): Time {.base.} =
+  ## Default implementation via `metadata`.
+  d.metadata(path).lastModified
 method append*(d: StorageDriver, path, content: string) {.abstract.}
 method writeStream*(d: StorageDriver, path: string, src: File) {.abstract.}
 method appendStream*(d: StorageDriver, path: string, src: File) {.abstract.}

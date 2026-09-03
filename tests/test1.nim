@@ -1,5 +1,9 @@
 import unittest
-import os, strutils, times, posix, memfiles
+import os, strutils, times, posix
+when defined(features.flysystem.useStdStreams):
+  import std/streams
+else:
+  import std/memfiles
 import std/syncio
 import checksums/md5
 import flysystem
@@ -327,18 +331,30 @@ test "readStream, delete, list (non-recursive), error wrapping":
   let d = newLocalDriver(root)
 
   # readStream returns a memory-mapped view of the file
+  # (or a FileStream with -d:features.flysystem.useStdStreams)
   d.write("data.txt", "mapped content")
-  var mf = d.readStream("data.txt")
-  check mf.size == "mapped content".len
-  var buf = newString(mf.size)
-  copyMem(addr buf[0], mf.mem, mf.size)
-  check buf == "mapped content"
-  close(mf)
+  when defined(features.flysystem.useStdStreams):
+    var s = d.readStream("data.txt")
+    check s.readAll() == "mapped content"
+    s.close()
+  else:
+    var mf = d.readStream("data.txt")
+    check mf.size == "mapped content".len
+    var buf = newString(mf.size)
+    copyMem(addr buf[0], mf.mem, mf.size)
+    check buf == "mapped content"
+    close(mf)
 
   # readStream of an empty file yields a resource-free size-0 stream
+  # (with std/streams the stream must still be closed)
   d.write("zerobytes.txt", "")
-  let zmf = d.readStream("zerobytes.txt")
-  check zmf.size == 0
+  when defined(features.flysystem.useStdStreams):
+    var zs = d.readStream("zerobytes.txt")
+    check zs.readAll() == ""
+    zs.close()
+  else:
+    let zmf = d.readStream("zerobytes.txt")
+    check zmf.size == 0
 
   # delete removes a file
   d.write("garbage.txt", "x")
@@ -376,8 +392,12 @@ test "readStream, delete, list (non-recursive), error wrapping":
 
   # readStream on a missing file raises StorageError too
   try:
-    var bad = d.readStream("nope.txt")
-    close(bad)
+    when defined(features.flysystem.useStdStreams):
+      var bad = d.readStream("nope.txt")
+      bad.close()
+    else:
+      var bad = d.readStream("nope.txt")
+      close(bad)
     assert false, "Expected StorageError for missing file"
   except StorageError as e:
     check "nope.txt" in e.msg
