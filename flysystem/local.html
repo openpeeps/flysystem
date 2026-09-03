@@ -101,6 +101,10 @@
   <li><a class="reference" href="#copyDir.e%2CLocalDriver%2Cstring%2Cstring" title="copyDir(d: LocalDriver; src, dest: string)">copyDir(d: LocalDriver; src, dest: string)</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">copyFromHost
+  <li><a class="reference" href="#copyFromHost.e%2CLocalDriver%2Cstring%2Cstring" title="copyFromHost(d: LocalDriver; srcAbs, destRel: string)">copyFromHost(d: LocalDriver; srcAbs, destRel: string)</a></li>
+
+</ul>
 <ul class="simple nested-toc-section">createSymlink
   <li><a class="reference" href="#createSymlink.e%2CLocalDriver%2Cstring%2Cstring" title="createSymlink(d: LocalDriver; path, target: string)">createSymlink(d: LocalDriver; path, target: string)</a></li>
 
@@ -119,6 +123,10 @@
 </ul>
 <ul class="simple nested-toc-section">exists
   <li><a class="reference" href="#exists.e%2CLocalDriver%2Cstring" title="exists(d: LocalDriver; path: string): bool">exists(d: LocalDriver; path: string): bool</a></li>
+
+</ul>
+<ul class="simple nested-toc-section">importFrom
+  <li><a class="reference" href="#importFrom.e%2CLocalDriver%2CStorageDriver%2Cstring%2Cstring" title="importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)">importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">isSymlink
@@ -162,7 +170,7 @@
 
 </ul>
 <ul class="simple nested-toc-section">readStream
-  <li><a class="reference" href="#readStream.e%2CLocalDriver%2Cstring" title="readStream(d: LocalDriver; path: string): MemFile">readStream(d: LocalDriver; path: string): MemFile</a></li>
+  <li><a class="reference" href="#readStream.e%2CLocalDriver%2Cstring" title="readStream(d: LocalDriver; path: string): FlysystemStream">readStream(d: LocalDriver; path: string): FlysystemStream</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">search
@@ -300,8 +308,8 @@
 </div>
 <div id="chmod-methods-all">
   <div id="chmod.e,LocalDriver,string,int">
-  <dt><pre><span class="Keyword">method</span> <a href="#chmod.e%2CLocalDriver%2Cstring%2Cint"><span class="Identifier">chmod</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">method</span> <a href="#chmod.e%2CLocalDriver%2Cstring%2Cint"><span class="Identifier">chmod</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">mode</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span> {.<span class="Identifier">base</span><span class="Other">,</span>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     Sets the file permission bits of <tt class="docutils literal"><span class="pre"><span class="Identifier">path</span></span></tt> to <tt class="docutils literal"><span class="pre"><span class="Identifier">mode</span></span></tt> (e.g. 0o644). POSIX-only.
@@ -312,7 +320,7 @@
 </div>
 <div id="chown-methods-all">
   <div id="chown.e,LocalDriver,string,int,int">
-  <dt><pre><span class="Keyword">method</span> <a href="#chown.e%2CLocalDriver%2Cstring%2Cint%2Cint"><span class="Identifier">chown</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">uid</span><span class="Other">,</span> <span class="Identifier">gid</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#chown.e%2CLocalDriver%2Cstring%2Cint%2Cint"><span class="Identifier">chown</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">uid</span><span class="Other">,</span> <span class="Identifier">gid</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -351,9 +359,23 @@
 </div>
 
 </div>
+<div id="copyFromHost-methods-all">
+  <div id="copyFromHost.e,LocalDriver,string,string">
+  <dt><pre><span class="Keyword">method</span> <a href="#copyFromHost.e%2CLocalDriver%2Cstring%2Cstring"><span class="Identifier">copyFromHost</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">srcAbs</span><span class="Other">,</span> <span class="Identifier">destRel</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span> {.<span class="Identifier">base</span><span class="Other">,</span>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">ValueError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span>
+    <span class="Identifier">ReadEnvEffect</span><span class="Other">,</span> <span class="Identifier">ReadIOEffect</span><span class="Other">,</span> <span class="Identifier">ReadDirEffect</span><span class="Other">,</span> <span class="Identifier">WriteDirEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    Copy a file or directory from an absolute host path <tt class="docutils literal"><span class="pre"><span class="Identifier">srcAbs</span></span></tt> (outside the driver root, e.g. a project readonly disk) into the driver at <tt class="docutils literal"><span class="pre"><span class="Identifier">destRel</span></span></tt>. Used for <tt class="docutils literal"><span class="pre"><span class="Identifier">clue</span> <span class="Identifier">install</span></span></tt> (local) which copies from the project disk to the clue disk.
+    
+  </dd>
+</div>
+
+</div>
 <div id="createSymlink-methods-all">
   <div id="createSymlink.e,LocalDriver,string,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#createSymlink.e%2CLocalDriver%2Cstring%2Cstring"><span class="Identifier">createSymlink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">,</span> <span class="Identifier">target</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#createSymlink.e%2CLocalDriver%2Cstring%2Cstring"><span class="Identifier">createSymlink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">,</span> <span class="Identifier">target</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -393,7 +415,7 @@
 </div>
 <div id="diskUsage-methods-all">
   <div id="diskUsage.e,LocalDriver">
-  <dt><pre><span class="Keyword">method</span> <a href="#diskUsage.e%2CLocalDriver"><span class="Identifier">diskUsage</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">tuple</span><span class="Other">[</span><span class="Identifier">total</span><span class="Other">,</span> <span class="Identifier">free</span><span class="Other">,</span> <span class="Identifier">used</span><span class="Other">:</span> <span class="Identifier">int64</span><span class="Other">]</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#diskUsage.e%2CLocalDriver"><span class="Identifier">diskUsage</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">)</span><span class="Other">:</span> <span class="Keyword">tuple</span><span class="Other">[</span><span class="Identifier">total</span><span class="Other">,</span> <span class="Identifier">free</span><span class="Other">,</span> <span class="Identifier">used</span><span class="Other">:</span> <span class="Identifier">int64</span><span class="Other">]</span> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -415,9 +437,24 @@
 </div>
 
 </div>
+<div id="importFrom-methods-all">
+  <div id="importFrom.e,LocalDriver,StorageDriver,string,string">
+  <dt><pre><span class="Keyword">method</span> <a href="#importFrom.e%2CLocalDriver%2CStorageDriver%2Cstring%2Cstring"><span class="Identifier">importFrom</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">srcDriver</span><span class="Other">:</span> <a href="core.html#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span>
+                  <span class="Identifier">srcRel</span><span class="Other">,</span> <span class="Identifier">destRel</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span> {.<span class="Identifier">base</span><span class="Other">,</span>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadDirEffect</span><span class="Other">,</span> <span class="Identifier">WriteDirEffect</span><span class="Other">,</span> <span class="Identifier">WriteIOEffect</span><span class="Other">,</span> <span class="Identifier">ReadIOEffect</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    Copy between two drivers (e.g. project readonly disk -&gt; clue disk). <tt class="docutils literal"><span class="pre"><span class="Identifier">srcRel</span></span></tt> is relative to <tt class="docutils literal"><span class="pre"><span class="Identifier">srcDriver</span><span class="Operator">.</span><span class="Identifier">root</span></span></tt>, <tt class="docutils literal"><span class="pre"><span class="Identifier">destRel</span></span></tt> to <tt class="docutils literal"><span class="pre"><span class="Identifier">d</span><span class="Operator">.</span><span class="Identifier">root</span></span></tt>.
+    
+  </dd>
+</div>
+
+</div>
 <div id="isSymlink-methods-all">
   <div id="isSymlink.e,LocalDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#isSymlink.e%2CLocalDriver%2Cstring"><span class="Identifier">isSymlink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#isSymlink.e%2CLocalDriver%2Cstring"><span class="Identifier">isSymlink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadDirEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -430,10 +467,10 @@
 <div id="lastModified-methods-all">
   <div id="lastModified.e,LocalDriver,string">
   <dt><pre><span class="Keyword">method</span> <a href="#lastModified.e%2CLocalDriver%2Cstring"><span class="Identifier">lastModified</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">times</span><span class="Other">.</span><span class="Identifier">Time</span> {.
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    Returns the last modification time of the file at the specified path.
+    Returns the last modification time — reuses <tt class="docutils literal"><span class="pre"><span class="Identifier">metadata</span></span></tt> internally.
     
   </dd>
 </div>
@@ -536,7 +573,7 @@
 </div>
 <div id="readLink-methods-all">
   <div id="readLink.e,LocalDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#readLink.e%2CLocalDriver%2Cstring"><span class="Identifier">readLink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#readLink.e%2CLocalDriver%2Cstring"><span class="Identifier">readLink</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -548,11 +585,11 @@
 </div>
 <div id="readStream-methods-all">
   <div id="readStream.e,LocalDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#readStream.e%2CLocalDriver%2Cstring"><span class="Identifier">readStream</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">MemFile</span> {.
+  <dt><pre><span class="Keyword">method</span> <a href="#readStream.e%2CLocalDriver%2Cstring"><span class="Identifier">readStream</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <a href="core.html#FlysystemStream"><span class="Identifier">FlysystemStream</span></a> {.
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadIOEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    Efficiently reads a file as a stream using memfiles, which allows for handling large files without loading them entirely into memory. An empty file yields a MemFile with <tt class="docutils literal"><span class="pre"><span class="Identifier">size</span> <span class="Operator">==</span> <span class="DecNumber">0</span></span></tt> and <tt class="docutils literal"><span class="pre"><span class="Identifier">mem</span> <span class="Operator">==</span> <span class="Keyword">nil</span></span></tt>, which holds no resources and does not need to be <tt class="docutils literal"><span class="pre"><span class="Identifier">close</span></span></tt>d.
+    Efficiently reads a file as a stream. Default backend uses memfiles (mmap); with <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">d</span><span class="Punctuation">:</span><span class="Identifier">features</span><span class="Operator">.</span><span class="Identifier">flysystem</span><span class="Operator">.</span><span class="Identifier">useStdStreams</span></span></tt> it returns a <tt class="docutils literal"><span class="pre"><span class="Identifier">Stream</span></span></tt> (<tt class="docutils literal"><span class="pre"><span class="Identifier">FileStream</span></span></tt>). An empty file with the mmap backend yields a <tt class="docutils literal"><span class="pre"><span class="Identifier">MemFile</span></span></tt> with <tt class="docutils literal"><span class="pre"><span class="Identifier">size</span> <span class="Operator">==</span> <span class="DecNumber">0</span></span></tt>/<tt class="docutils literal"><span class="pre"><span class="Identifier">mem</span> <span class="Operator">==</span> <span class="Keyword">nil</span></span></tt> that does not need <tt class="docutils literal"><span class="pre"><span class="Identifier">close</span></span></tt>. With streams, the returned <tt class="docutils literal"><span class="pre"><span class="Identifier">Stream</span></span></tt> must always be closed, even for empty files.
     
   </dd>
 </div>
@@ -586,11 +623,11 @@
 </div>
 <div id="size-methods-all">
   <div id="size.e,LocalDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#size.e%2CLocalDriver%2Cstring"><span class="Identifier">size</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int64</span> {.
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">,</span> <span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadIOEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">method</span> <a href="#size.e%2CLocalDriver%2Cstring"><span class="Identifier">size</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="core.html#LocalDriver"><span class="Identifier">LocalDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int64</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    Returns the size in bytes of the file at the specified path.
+    Returns the size in bytes — reuses <tt class="docutils literal"><span class="pre"><span class="Identifier">metadata</span></span></tt> internally.
     
   </dd>
 </div>
@@ -663,7 +700,7 @@
     <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ReadIOEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    Iterates over the lines of the file at <tt class="docutils literal"><span class="pre"><span class="Identifier">path</span></span></tt> using a memory-mapped read. A single internal buffer is reused across lines, so no per-line allocations happen. The yielded string is only valid until the next iteration — copy it if you need to keep it.
+    Iterates over the lines of the file at <tt class="docutils literal"><span class="pre"><span class="Identifier">path</span></span></tt>. Default backend uses a memory-mapped read; with <tt class="docutils literal"><span class="pre"><span class="Operator">-</span><span class="Identifier">d</span><span class="Punctuation">:</span><span class="Identifier">features</span><span class="Operator">.</span><span class="Identifier">flysystem</span><span class="Operator">.</span><span class="Identifier">useStdStreams</span></span></tt> it uses <tt class="docutils literal"><span class="pre"><span class="Identifier">FileStream</span></span></tt>. A single internal buffer is reused across lines, so no per-line allocations happen. The yielded string is only valid until the next iteration — copy it if you need to keep it.
     
   </dd>
 </div>
@@ -696,7 +733,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-08-31 08:04:26 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-09-03 10:39:09 UTC</small>
       </div>
     </div>
   </div>

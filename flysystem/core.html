@@ -64,6 +64,7 @@
   lastModified*: Time
   visibility*: Visibility
   isDir*: bool">FileMetadata</a></li>
+<li><a class="reference" href="#FlysystemStream" title="FlysystemStream = MemFile">FlysystemStream</a></li>
 <li><a class="reference" href="#LocalDriver" title="LocalDriver = ref object of StorageDriver">LocalDriver</a></li>
 <li><a class="reference" href="#StorageDriver" title="StorageDriver = ref object of RootObj
   root*: string">StorageDriver</a></li>
@@ -143,7 +144,7 @@
 
 </ul>
 <ul class="simple nested-toc-section">readStream
-  <li><a class="reference" href="#readStream.e%2CStorageDriver%2Cstring" title="readStream(d: StorageDriver; path: string): MemFile">readStream(d: StorageDriver; path: string): MemFile</a></li>
+  <li><a class="reference" href="#readStream.e%2CStorageDriver%2Cstring" title="readStream(d: StorageDriver; path: string): FlysystemStream">readStream(d: StorageDriver; path: string): FlysystemStream</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">search
@@ -212,6 +213,14 @@
   <dd>
     
     Metadata for a file or directory, including its path, size, last modified time, visibility, and whether it's a directory. This is returned by the <tt class="docutils literal"><span class="pre"><span class="Identifier">metadata</span></span></tt> method and the <tt class="docutils literal"><span class="pre"><span class="Identifier">list</span></span></tt> method of storage drivers to provide information about files and directories
+    
+  </dd>
+</div>
+<div id="FlysystemStream">
+  <dt><pre><a href="#FlysystemStream"><span class="Identifier">FlysystemStream</span></a> <span class="Other">=</span> <span class="Identifier">MemFile</span></pre></dt>
+  <dd>
+    
+    
     
   </dd>
 </div>
@@ -354,10 +363,10 @@
 <div id="lastModified-methods-all">
   <div id="lastModified.e,StorageDriver,string">
   <dt><pre><span class="Keyword">method</span> <a href="#lastModified.e%2CStorageDriver%2Cstring"><span class="Identifier">lastModified</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Time</span> {.<span class="Identifier">base</span><span class="Other">,</span>
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    
+    Default implementation via <tt class="docutils literal"><span class="pre"><span class="Identifier">metadata</span></span></tt>.
     
   </dd>
 </div>
@@ -449,7 +458,7 @@
 </div>
 <div id="readStream-methods-all">
   <div id="readStream.e,StorageDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#readStream.e%2CStorageDriver%2Cstring"><span class="Identifier">readStream</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">MemFile</span> {.<span class="Identifier">base</span><span class="Other">,</span>
+  <dt><pre><span class="Keyword">method</span> <a href="#readStream.e%2CStorageDriver%2Cstring"><span class="Identifier">readStream</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <a href="#FlysystemStream"><span class="Identifier">FlysystemStream</span></a> {.<span class="Identifier">base</span><span class="Other">,</span>
     <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -485,11 +494,11 @@
 </div>
 <div id="size-methods-all">
   <div id="size.e,StorageDriver,string">
-  <dt><pre><span class="Keyword">method</span> <a href="#size.e%2CStorageDriver%2Cstring"><span class="Identifier">size</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int64</span> {.<span class="Identifier">base</span><span class="Other">,</span>
-    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">StorageError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">method</span> <a href="#size.e%2CStorageDriver%2Cstring"><span class="Identifier">size</span></a><span class="Other">(</span><span class="Identifier">d</span><span class="Other">:</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int64</span> {.<span class="Identifier">base</span><span class="Other">,</span> <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">RootEffect</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    
+    Default implementation via <tt class="docutils literal"><span class="pre"><span class="Identifier">metadata</span></span></tt> — drivers may override for efficiency.
     
   </dd>
 </div>
@@ -570,7 +579,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-08-31 08:04:26 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-09-03 10:39:09 UTC</small>
       </div>
     </div>
   </div>

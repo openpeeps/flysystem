@@ -87,6 +87,10 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method copyDir(p: FilesystemPolicy; src, dest: string)" href="flysystem/policy.html#copyDir.e%2CFilesystemPolicy%2Cstring%2Cstring">policy: method copyDir(p: FilesystemPolicy; src, dest: string)</a></li>
           </ul></dd>
+<dt><a name="copyFromHost" href="#copyFromHost"><span>copyFromHost:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="local: method copyFromHost(d: LocalDriver; srcAbs, destRel: string)" href="flysystem/local.html#copyFromHost.e%2CLocalDriver%2Cstring%2Cstring">local: method copyFromHost(d: LocalDriver; srcAbs, destRel: string)</a></li>
+          </ul></dd>
 <dt><a name="createSymlink" href="#createSymlink"><span>createSymlink:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method createSymlink(d: LocalDriver; path, target: string)" href="flysystem/local.html#createSymlink.e%2CLocalDriver%2Cstring%2Cstring">local: method createSymlink(d: LocalDriver; path, target: string)</a></li>
@@ -146,6 +150,18 @@
 <dt><a name="FilesystemPolicy" href="#FilesystemPolicy"><span>FilesystemPolicy:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="policy: type FilesystemPolicy" href="flysystem/policy.html#FilesystemPolicy">policy: type FilesystemPolicy</a></li>
+          </ul></dd>
+<dt><a name="FilesystemPolicyError" href="#FilesystemPolicyError"><span>FilesystemPolicyError:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="policy: object FilesystemPolicyError" href="flysystem/policy.html#FilesystemPolicyError">policy: object FilesystemPolicyError</a></li>
+          </ul></dd>
+<dt><a name="FlysystemStream" href="#FlysystemStream"><span>FlysystemStream:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="core: type FlysystemStream" href="flysystem/core.html#FlysystemStream">core: type FlysystemStream</a></li>
+          </ul></dd>
+<dt><a name="importFrom" href="#importFrom"><span>importFrom:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="local: method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)" href="flysystem/local.html#importFrom.e%2CLocalDriver%2CStorageDriver%2Cstring%2Cstring">local: method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)</a></li>
           </ul></dd>
 <dt><a name="inner" href="#inner"><span>inner:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -249,10 +265,6 @@
           <li><a class="reference external"
           data-doc-search-tag="filesystem: template parseYaml[T](fs: Filesystem; path: string; t: typedesc[T]): untyped" href="flysystem/filesystem.html#parseYaml.t%2CFilesystem%2Cstring%2Ctypedesc%5BT%5D">filesystem: template parseYaml[T](fs: Filesystem; path: string; t: typedesc[T]): untyped</a></li>
           </ul></dd>
-<dt><a name="PolicyError" href="#PolicyError"><span>PolicyError:</span></a></dt><dd><ul class="simple">
-<li><a class="reference external"
-          data-doc-search-tag="policy: object PolicyError" href="flysystem/policy.html#PolicyError">policy: object PolicyError</a></li>
-          </ul></dd>
 <dt><a name="PolicyRules" href="#PolicyRules"><span>PolicyRules:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="policy: object PolicyRules" href="flysystem/policy.html#PolicyRules">policy: object PolicyRules</a></li>
@@ -281,11 +293,11 @@
           </ul></dd>
 <dt><a name="readStream" href="#readStream"><span>readStream:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="core: method readStream(d: StorageDriver; path: string): MemFile" href="flysystem/core.html#readStream.e%2CStorageDriver%2Cstring">core: method readStream(d: StorageDriver; path: string): MemFile</a></li>
+          data-doc-search-tag="core: method readStream(d: StorageDriver; path: string): FlysystemStream" href="flysystem/core.html#readStream.e%2CStorageDriver%2Cstring">core: method readStream(d: StorageDriver; path: string): FlysystemStream</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="local: method readStream(d: LocalDriver; path: string): MemFile" href="flysystem/local.html#readStream.e%2CLocalDriver%2Cstring">local: method readStream(d: LocalDriver; path: string): MemFile</a></li>
+          data-doc-search-tag="local: method readStream(d: LocalDriver; path: string): FlysystemStream" href="flysystem/local.html#readStream.e%2CLocalDriver%2Cstring">local: method readStream(d: LocalDriver; path: string): FlysystemStream</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="policy: method readStream(p: FilesystemPolicy; path: string): MemFile" href="flysystem/policy.html#readStream.e%2CFilesystemPolicy%2Cstring">policy: method readStream(p: FilesystemPolicy; path: string): MemFile</a></li>
+          data-doc-search-tag="policy: method readStream(p: FilesystemPolicy; path: string): FlysystemStream" href="flysystem/policy.html#readStream.e%2CFilesystemPolicy%2Cstring">policy: method readStream(p: FilesystemPolicy; path: string): FlysystemStream</a></li>
           </ul></dd>
 <dt><a name="rules" href="#rules"><span>rules:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -377,7 +389,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-08-31 08:04:26 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-09-03 10:39:10 UTC</small>
       </div>
     </div>
   </div>

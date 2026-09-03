@@ -1,5 +1,5 @@
 nimTitle	policy	flysystem/policy.html	module flysystem/policy		0
-nim	PolicyError	flysystem/policy.html#PolicyError	object PolicyError		13
+nim	FilesystemPolicyError	flysystem/policy.html#FilesystemPolicyError	object FilesystemPolicyError		13
 nim	PolicyRules	flysystem/policy.html#PolicyRules	object PolicyRules		19
 nim	FilesystemPolicy	flysystem/policy.html#FilesystemPolicy	type FilesystemPolicy		38
 nim	defaultPolicyRules	flysystem/policy.html#defaultPolicyRules	proc defaultPolicyRules(): PolicyRules		45
@@ -7,7 +7,7 @@ nim	newFilesystemPolicy	flysystem/policy.html#newFilesystemPolicy,StorageDriver,
 nim	inner	flysystem/policy.html#inner,FilesystemPolicy	proc inner(p: FilesystemPolicy): StorageDriver		54
 nim	rules	flysystem/policy.html#rules,FilesystemPolicy	proc rules(p: FilesystemPolicy): PolicyRules		58
 nim	read	flysystem/policy.html#read.e,FilesystemPolicy,string	method read(p: FilesystemPolicy; path: string): string		131
-nim	readStream	flysystem/policy.html#readStream.e,FilesystemPolicy,string	method readStream(p: FilesystemPolicy; path: string): MemFile		135
+nim	readStream	flysystem/policy.html#readStream.e,FilesystemPolicy,string	method readStream(p: FilesystemPolicy; path: string): FlysystemStream		135
 nim	exists	flysystem/policy.html#exists.e,FilesystemPolicy,string	method exists(p: FilesystemPolicy; path: string): bool		139
 nim	list	flysystem/policy.html#list.e,FilesystemPolicy,string	method list(p: FilesystemPolicy; path: string; recursive = false): seq[FileMetadata]		143
 nim	search	flysystem/policy.html#search.e,FilesystemPolicy,string	method search(p: FilesystemPolicy; pattern: string): seq[string]		152
