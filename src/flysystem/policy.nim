@@ -28,7 +28,9 @@ type
     maxDepth*: int
       ## maximum number of path segments; 0 = unlimited
     denyHiddenFiles*: bool
-      ## block creation of hidden files and filter them from listings
+      ## block creation of hidden files, deny reading them, and filter them
+      ## from listings. `exists` still reports them (read access to the fact
+      ## of existence is allowed); only content and metadata reads are denied.
     allowedExtensions*: seq[string]
       ## allowed file extensions without the leading dot; empty = allow all
     allowedMimeTypes*: seq[string]
@@ -88,10 +90,15 @@ proc checkHidden(p: FilesystemPolicy, operation, path: string) =
   if p.rules.denyHiddenFiles and isHidden(path):
     policyError(operation, "denyHiddenFiles", "hidden path: '" & path & "'")
 
-proc checkCreate(p: FilesystemPolicy, operation, path: string) =
-  ## Enforces create-target rules: hidden files, allowed extensions and
-  ## allowed MIME types.
-  p.checkHidden(operation, path)
+proc isDirPath(p: FilesystemPolicy, path: string): bool =
+  ## True when `path` names a directory. Missing paths report false so the
+  ## downstream operation raises its own not-found error.
+  try:
+    result = p.inner.metadata(path).isDir
+  except CatchableError:
+    result = false
+
+proc checkExtension(p: FilesystemPolicy, operation, path: string) =
   if p.rules.allowedExtensions.len > 0:
     var ext = splitFile(path).ext
     if ext.len > 0:
@@ -99,6 +106,8 @@ proc checkCreate(p: FilesystemPolicy, operation, path: string) =
     if ext.len == 0 or ext notin p.rules.allowedExtensions:
       policyError(operation, "allowedExtensions",
         "extension not allowed: '" & path & "'")
+
+proc checkMime(p: FilesystemPolicy, operation, path: string) =
   if p.rules.allowedMimeTypes.len > 0:
     let ext = splitFile(path).ext
     let mime =
@@ -107,6 +116,41 @@ proc checkCreate(p: FilesystemPolicy, operation, path: string) =
     if mime notin p.rules.allowedMimeTypes:
       policyError(operation, "allowedMimeTypes",
         "mime type not allowed: '" & path & "' (" & mime & ")")
+
+proc checkAccess(p: FilesystemPolicy, operation, path: string) =
+  ## Enforces access rules: hidden files, allowed extensions and allowed MIME
+  ## types. Applies to both reads and writes — a read-only server gets no
+  ## enforcement at all otherwise, since the write-only `checkCreate` this
+  ## replaces never fired for it. Directories skip the extension/MIME rules
+  ## (a directory has no extension) but never the hidden rule.
+  p.checkHidden(operation, path)
+  if p.isDirPath(path):
+    return
+  p.checkExtension(operation, path)
+  p.checkMime(operation, path)
+
+proc pathAllowed(p: FilesystemPolicy, path: string, isDir: bool): bool =
+  ## Non-raising access check for enumeration (`list`, `search`, `exists`).
+  ## Denied paths are filtered (or reported absent) rather than raising, so
+  ## queries stay queries. Mirrors `checkAccess` without the directory stat.
+  if p.rules.denyHiddenFiles and isHidden(path):
+    return false
+  if isDir:
+    return true
+  if p.rules.allowedExtensions.len > 0:
+    var ext = splitFile(path).ext
+    if ext.len > 0:
+      ext = ext[1..^1]
+    if ext.len == 0 or ext notin p.rules.allowedExtensions:
+      return false
+  if p.rules.allowedMimeTypes.len > 0:
+    let ext = splitFile(path).ext
+    let mime =
+      if ext.len > 0: getMimeType(ext[1..^1]).get("application/octet-stream")
+      else: "application/octet-stream"
+    if mime notin p.rules.allowedMimeTypes:
+      return false
+  true
 
 proc checkSize(p: FilesystemPolicy, operation: string, size: int64) =
   if p.rules.maxFileSize > 0 and size > p.rules.maxFileSize:
@@ -123,62 +167,72 @@ proc checkTree(p: FilesystemPolicy, operation, src, dest: string) =
         else: item.path.relativePath(src)
       let destPath = dest / rel
       p.checkPath(operation, destPath)
-      p.checkCreate(operation, destPath)
+      p.checkAccess(operation, destPath)
 
 #
 # Read operations
 #
 method read*(p: FilesystemPolicy, path: string): string =
   p.checkPath("read", path)
+  p.checkAccess("read", path)
+  p.checkSize("read", p.inner.size(path))
   p.inner.read(path)
 
 method readStream*(p: FilesystemPolicy, path: string): FlysystemStream =
   p.checkPath("readStream", path)
+  p.checkAccess("readStream", path)
+  p.checkSize("readStream", p.inner.size(path))
   p.inner.readStream(path)
 
 method exists*(p: FilesystemPolicy, path: string): bool =
+  ## Existence is not access-filtered: the suite pins that `exists` (like
+  ## `list` membership for the queried path itself) still works for hidden
+  ## files — "read access allowed". Denial happens at read/metadata time, and
+  ## listings/search filter denied entries out.
   p.checkPath("exists", path)
   p.inner.exists(path)
 
 method list*(p: FilesystemPolicy, path: string,
     recursive = false): seq[FileMetadata] =
   p.checkPath("list", path)
-  result = p.inner.list(path, recursive)
-  if p.rules.denyHiddenFiles:
-    for i in countdown(result.high, 0):
-      if isHidden(result[i].path):
-        result.delete(i)
+  for item in p.inner.list(path, recursive):
+    if p.pathAllowed(item.path, item.isDir):
+      result.add(item)
 
 method search*(p: FilesystemPolicy, pattern: string): seq[string] =
   p.checkPath("search", pattern)
-  result = p.inner.search(pattern)
-  if p.rules.denyHiddenFiles:
-    for i in countdown(result.high, 0):
-      if isHidden(result[i]):
-        result.delete(i)
+  for hit in p.inner.search(pattern):
+    if p.pathAllowed(hit, false):
+      result.add(hit)
 
 method visibility*(p: FilesystemPolicy, path: string): Visibility =
   p.checkPath("visibility", path)
+  p.checkAccess("visibility", path)
   p.inner.visibility(path)
 
 method metadata*(p: FilesystemPolicy, path: string): FileMetadata =
   p.checkPath("metadata", path)
+  p.checkAccess("metadata", path)
   p.inner.metadata(path)
 
 method size*(p: FilesystemPolicy, path: string): int64 =
   p.checkPath("size", path)
+  p.checkAccess("size", path)
   p.inner.size(path)
 
 method lastModified*(p: FilesystemPolicy, path: string): Time =
   p.checkPath("lastModified", path)
+  p.checkAccess("lastModified", path)
   p.inner.lastModified(path)
 
 method checksum*(p: FilesystemPolicy, path: string): string =
   p.checkPath("checksum", path)
+  p.checkAccess("checksum", path)
   p.inner.checksum(path)
 
 method mimeType*(p: FilesystemPolicy, path: string): string =
   p.checkPath("mimeType", path)
+  p.checkAccess("mimeType", path)
   p.inner.mimeType(path)
 
 #
@@ -188,14 +242,14 @@ method write*(p: FilesystemPolicy, path, content: string,
     visibility = visPrivate) =
   p.checkWritable("write")
   p.checkPath("write", path)
-  p.checkCreate("write", path)
+  p.checkAccess("write", path)
   p.checkSize("write", content.len.int64)
   p.inner.write(path, content, visibility)
 
 method append*(p: FilesystemPolicy, path, content: string) =
   p.checkWritable("append")
   p.checkPath("append", path)
-  p.checkCreate("append", path)
+  p.checkAccess("append", path)
   var existing: int64 = 0
   if p.inner.exists(path):
     existing = p.inner.size(path)
@@ -205,14 +259,14 @@ method append*(p: FilesystemPolicy, path, content: string) =
 method writeStream*(p: FilesystemPolicy, path: string, src: File) =
   p.checkWritable("writeStream")
   p.checkPath("writeStream", path)
-  p.checkCreate("writeStream", path)
+  p.checkAccess("writeStream", path)
   p.checkSize("writeStream", getFileSize(src))
   p.inner.writeStream(path, src)
 
 method appendStream*(p: FilesystemPolicy, path: string, src: File) =
   p.checkWritable("appendStream")
   p.checkPath("appendStream", path)
-  p.checkCreate("appendStream", path)
+  p.checkAccess("appendStream", path)
   var existing: int64 = 0
   if p.inner.exists(path):
     existing = p.inner.size(path)
@@ -228,14 +282,14 @@ method move*(p: FilesystemPolicy, src, dest: string) =
   p.checkWritable("move")
   p.checkPath("move", src)
   p.checkPath("move", dest)
-  p.checkCreate("move", dest)
+  p.checkAccess("move", dest)
   p.inner.move(src, dest)
 
 method copy*(p: FilesystemPolicy, src, dest: string) =
   p.checkWritable("copy")
   p.checkPath("copy", src)
   p.checkPath("copy", dest)
-  p.checkCreate("copy", dest)
+  p.checkAccess("copy", dest)
   p.inner.copy(src, dest)
 
 method makeDir*(p: FilesystemPolicy, path: string) =
@@ -252,7 +306,7 @@ method deleteDir*(p: FilesystemPolicy, path: string, force = false) =
 method touch*(p: FilesystemPolicy, path: string) =
   p.checkWritable("touch")
   p.checkPath("touch", path)
-  p.checkCreate("touch", path)
+  p.checkAccess("touch", path)
   p.inner.touch(path)
 
 method copyDir*(p: FilesystemPolicy, src, dest: string) =
