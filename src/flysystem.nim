@@ -24,5 +24,5 @@
 ## denial, path limits) before delegating operations. Violations raise
 ## `FilesystemPolicyError` (a subtype of `StorageError`).
 
-import ./flysystem/[core, local, policy, filesystem]
-export core, local, policy, filesystem
+import ./flysystem/[core, local, policy, filesystem, securejoin]
+export core, local, policy, filesystem, securejoin

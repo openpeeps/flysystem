@@ -44,6 +44,17 @@ type
   LocalDriver* = ref object of StorageDriver
     ## Filesystem driver using an absolute runtime root.
     ## The root is set at runtime (from config/env), NOT at compile time.
+    sroot*: SecureRoot
+    ## The root held open as a directory descriptor plus its canonical path.
+    ## Every operation descends from this descriptor (see `securejoin`), so
+    ## containment never depends on re-parsing a string.
+
+  SecureRoot* = object
+    ## A driver root held open as a directory descriptor plus its canonical
+    ## path. Defined here (rather than in `securejoin`) so driver types can
+    ## carry it without an import cycle; `securejoin` implements on it.
+    fd*: cint
+    path*: string
 
   StorageError* = object of CatchableError
 
