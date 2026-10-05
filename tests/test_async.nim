@@ -144,3 +144,37 @@ test "async visibility, touch, symlinks, posix":
   waitFor main()
   if dirExists(root):
     removeDir(root)
+
+test "async sandbox: prefix sibling and symlinks":
+  let root = makeRoot("tmp_async_sandbox")
+  let sibling = joinPath(getCurrentDir() / "tests" / "tmp_async_sandbox-backup")
+  if dirExists(sibling): removeDir(sibling)
+  createDir(sibling)
+  writeFile(sibling / "secret.txt", "PREFIX-LEAK")
+  let outside = joinPath(getCurrentDir() / "tests" / "tmp_async_outside.txt")
+  writeFile(outside, "OUTSIDE-LEAK")
+  let d = newAsyncLocalDriver(root)
+  proc main() {.async.} =
+    await d.write("real.txt", "payload")
+    check (await d.read("real.txt")) == "payload"
+    try:
+      discard await d.read("../tmp_async_sandbox-backup/secret.txt")
+      assert false, "Expected StorageError for prefix-sibling escape"
+    except StorageError as e:
+      check "Path traversal detected" in e.msg
+    os.createSymlink("real.txt", root / "inward.txt")
+    check (await d.read("inward.txt")) == "payload"
+    os.createSymlink(outside, root / "escape.txt")
+    try:
+      discard await d.read("escape.txt")
+      assert false, "Expected StorageError for outward symlink"
+    except StorageError as e:
+      check "Path traversal detected" in e.msg
+    check await d.isSymlink("escape.txt")
+    await d.delete("escape.txt")
+    check not (await d.exists("escape.txt"))
+    check readFile(outside) == "OUTSIDE-LEAK"
+  waitFor main()
+  removeFile(outside)
+  if dirExists(sibling): removeDir(sibling)
+  if dirExists(root): removeDir(root)

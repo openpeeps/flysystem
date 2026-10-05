@@ -404,3 +404,100 @@ test "readStream, delete, list (non-recursive), error wrapping":
 
   if dirExists(root):
     removeDir(root)
+test "sandbox: prefix sibling is outside the root":
+  # A sibling directory whose name merely starts with the root's name must not
+  # compare as inside it. This is the gap a bare startsWith(root) check leaves.
+  let root = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_prefix")
+  let sibling = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_prefix-backup")
+  for dir in [root, sibling]:
+    if dirExists(dir): removeDir(dir)
+    createDir(dir)
+  writeFile(sibling / "secret.txt", "PREFIX-LEAK")
+  let d = newLocalDriver(root)
+  d.write("ok.txt", "inside")
+  check d.read("ok.txt") == "inside"
+  try:
+    discard d.read("../tmp_sandbox_prefix-backup/secret.txt")
+    assert false, "Expected StorageError for prefix-sibling escape"
+  except StorageError as e:
+    check "Path traversal detected" in e.msg
+  for dir in [root, sibling]:
+    if dirExists(dir): removeDir(dir)
+
+test "sandbox: symlinks resolve inside the drive or fail":
+  let root = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_links")
+  if dirExists(root): removeDir(root)
+  createDir(root)
+  let outside = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_outside.txt")
+  writeFile(outside, "OUTSIDE-LEAK")
+  let d = newLocalDriver(root)
+  d.write("real.txt", "payload")
+  # A link staying inside the drive resolves transparently...
+  os.createSymlink("real.txt", root / "inward.txt")
+  check d.read("inward.txt") == "payload"
+  check d.exists("inward.txt")
+  # ...while a link pointing outside is unusable at every layer.
+  os.createSymlink(outside, root / "escape.txt")
+  for op in [proc(): string = d.read("escape.txt"),
+             proc(): string = (discard d.metadata("escape.txt"); ""),
+             proc(): string = (discard d.size("escape.txt"); "")]:
+    try:
+      discard op()
+      assert false, "Expected StorageError for outward symlink"
+    except StorageError as e:
+      check "Path traversal detected" in e.msg
+  # Link-acting operations still see the link itself.
+  check d.isSymlink("escape.txt")
+  check not d.isSymlink("real.txt")
+  # Deleting a link removes the link and leaves the target intact.
+  d.delete("escape.txt")
+  check not d.exists("escape.txt")
+  check readFile(outside) == "OUTSIDE-LEAK"
+  # Creating an external link is refused up front.
+  try:
+    d.createSymlink("bad.txt", outside)
+    assert false, "Expected StorageError for external symlink target"
+  except StorageError as e:
+    check "Path traversal detected" in e.msg
+  removeFile(outside)
+  if dirExists(root): removeDir(root)
+
+test "sandbox: absolute link targets are refused":
+  # An absolute symlink target can only name something outside the drive by
+  # construction, so it is refused even when it happens to point back inside.
+  let root = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_abslink")
+  if dirExists(root): removeDir(root)
+  createDir(root)
+  let d = newLocalDriver(root)
+  d.write("real.txt", "payload")
+  os.createSymlink(root / "real.txt", root / "abs.txt")
+  try:
+    discard d.read("abs.txt")
+    assert false, "Expected StorageError for absolute link target"
+  except StorageError as e:
+    check "Path traversal detected" in e.msg
+  if dirExists(root): removeDir(root)
+
+test "sandbox: symlink cycles raise instead of hanging":
+  let root = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_cycle")
+  if dirExists(root): removeDir(root)
+  createDir(root)
+  let d = newLocalDriver(root)
+  os.createSymlink("b", root / "a")
+  os.createSymlink("a", root / "b")
+  try:
+    discard d.read("a")
+    assert false, "Expected StorageError for symlink cycle"
+  except StorageError as e:
+    check "Too many levels" in e.msg
+  if dirExists(root): removeDir(root)
+
+test "sandbox: metadata paths stay root-relative":
+  let root = joinPath(getCurrentDir() / "tests" / "tmp_sandbox_meta")
+  if dirExists(root): removeDir(root)
+  createDir(root)
+  let d = newLocalDriver(root)
+  d.write("sub/f.txt", "x")
+  check d.metadata("./sub/../sub/f.txt").path == "sub" / "f.txt"
+  check d.metadata("sub").isDir
+  if dirExists(root): removeDir(root)

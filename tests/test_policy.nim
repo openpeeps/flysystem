@@ -284,3 +284,91 @@ test "policy attached to a Filesystem disk":
 
   if dirExists(root):
     removeDir(root)
+
+test "policy denies reads, not just writes":
+  # FilesystemPolicy.read used to call only checkPath, so denyHiddenFiles and
+  # the allowlists never fired for a read-only consumer. Every read-side
+  # accessor below must enforce them; exists/list/search keep their
+  # query semantics (absent/filtered, never raising).
+  let root = makeRoot("tmp_policy_reads")
+  let d = newLocalDriver(root)
+  d.write("ok.txt", "text")
+  d.write("data.bin", "binary-bytes")
+  d.write(".hidden.txt", "hidden")
+  let p = newFilesystemPolicy(d, PolicyRules(
+    allowedExtensions: @["txt"],
+    allowedMimeTypes: @["text/plain"],
+    denyHiddenFiles: true))
+
+  check p.read("ok.txt") == "text"
+
+  for op in [proc(): string = p.read("data.bin"),
+             proc(): string = p.read(".hidden.txt"),
+             proc(): string = (discard p.metadata("data.bin"); ""),
+             proc(): string = (discard p.size("data.bin"); ""),
+             proc(): string = (discard p.checksum("data.bin"); ""),
+             proc(): string = (discard p.mimeType("data.bin"); ""),
+             proc(): string = (discard p.visibility("data.bin"); ""),
+             proc(): string = (discard p.lastModified("data.bin"); "")]:
+    try:
+      discard op()
+      assert false, "Expected FilesystemPolicyError on read-side access"
+    except FilesystemPolicyError as e:
+      check e.rule in ["allowedExtensions", "allowedMimeTypes",
+                       "denyHiddenFiles"]
+
+  # readStream enforces too (content and size paths).
+  try:
+    var bad = p.readStream("data.bin")
+    close(bad)
+    assert false, "Expected FilesystemPolicyError for readStream"
+  except FilesystemPolicyError as e:
+    check e.rule in ["allowedExtensions", "allowedMimeTypes"]
+
+  # Queries filter instead of raising; exists still reports hidden files,
+  # matching the long-standing "read access allowed" contract for existence.
+  check p.exists(".hidden.txt")
+  check not p.exists("missing.txt")
+  for it in p.list(""):
+    check it.path != "data.bin"
+    check not it.path.startsWith(".")
+  for hit in p.search("*"):
+    check hit != "data.bin"
+    check not extractFilename(hit).startsWith(".")
+
+  if dirExists(root):
+    removeDir(root)
+
+test "policy maxFileSize bounds reads":
+  let root = makeRoot("tmp_policy_readsize")
+  let d = newLocalDriver(root)
+  d.write("small.txt", "12345")
+  d.write("big.txt", "123456789012345")
+  let p = newFilesystemPolicy(d, PolicyRules(maxFileSize: 10))
+  check p.read("small.txt") == "12345"
+  try:
+    discard p.read("big.txt")
+    assert false, "Expected FilesystemPolicyError for oversized read"
+  except FilesystemPolicyError as e:
+    check e.rule == "maxFileSize"
+  try:
+    var bad = p.readStream("big.txt")
+    close(bad)
+    assert false, "Expected FilesystemPolicyError for oversized readStream"
+  except FilesystemPolicyError as e:
+    check e.rule == "maxFileSize"
+  if dirExists(root):
+    removeDir(root)
+
+test "policy allows directory metadata under an allowlist":
+  # Extension rules apply to files; a directory has no extension, so probing
+  # it must not spuriously fail.
+  let root = makeRoot("tmp_policy_dirmeta")
+  let d = newLocalDriver(root)
+  d.makeDir("sub")
+  d.write("sub/ok.txt", "x")
+  let p = newFilesystemPolicy(d, PolicyRules(allowedExtensions: @["txt"]))
+  check p.metadata("sub").isDir
+  check p.list("sub").len == 1
+  if dirExists(root):
+    removeDir(root)
