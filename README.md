@@ -18,9 +18,9 @@
 - **Preventing Directory Traversal**: All file operations are securely sandboxed to prevent access outside the designated root directory, mitigating directory traversal vulnerabilities.
 - **Atomic Writes**: Content is written to a temporary file and renamed over the target, so a crash mid-write never corrupts a file.
 - **Memory-Efficient**: Handle large files without loading them entirely into memory via `MemFiles`, including a zero-allocation `readLines` iterator. Swap in `std/streams` with `-d:features.flysystem.useStdStreams`.
-- **Async Driver**: Opt-in `AsyncLocalDriver` implementing the same methods asynchronously (`await d.write(...)`) on stdlib `asyncfile`/`asyncdispatch` — no extra dependencies.
+- **Async Driver**: Opt-in `AsyncLocalDriver` implementing the same methods asynchronously (`await d.write(...)`) on stdlib `asyncdispatch` — no extra dependencies. Path resolution uses the same verified descriptor walk; fd IO runs synchronously inside the async methods.
 - **POSIX Tooling**: Symlinks, advisory file locking, `chmod`/`chown` and `statvfs`-based disk-usage helpers.
-- **Security Policies**: Wrap any driver with `FilesystemPolicy` to enforce read-only mode, size caps, extension/MIME allowlists, hidden-file denial and path limits — attachable per disk.
+- **Security Policies**: Wrap any driver with `FilesystemPolicy` to enforce read-only mode, size caps, extension/MIME allowlists, hidden-file denial and path limits — attachable per disk. Rules apply to reads as well as writes (`exists` still reports hidden files; listings filter them).
 - **Multi-Disk Facade**: Group several drivers under a `Filesystem` and switch between them with one call.
 
 > [!NOTE]
@@ -218,11 +218,24 @@ try:
 except StorageError as e:
   echo e.msg   # "Failed to read 'missing.txt': ..."
 
-# every driver is sandboxed: nothing can escape the root
+# every driver is sandboxed: nothing can escape the root.
+# containment is enforced by construction, not by checking strings: each path
+# component is opened with openat through a held parent descriptor, symlinks
+# fail loudly instead of being followed silently, and a link is followed only
+# when its resolved target stays inside the drive (absolute targets are
+# refused outright). prefix-sharing siblings (root-backup beside root) and
+# outward links are both refused; inward links resolve transparently.
 try:
   d.write("../evil.txt", "nope")
 except StorageError as e:
   echo e.msg   # "Path traversal detected: ../evil.txt"
+
+# note on strength: this closes every static-layout escape with zero gap
+# (verification and opening are the same syscall chain). against an attacker
+# concurrently renaming directories mid-operation it is the strongest
+# construction available without kernel openat2(RESOLVE_IN_ROOT), which only
+# Linux has. on non-POSIX platforms containment falls back to a lexical
+# separator-boundary check, which closes prefix confusion but not symlinks.
 ```
 
 ### 🔒 Security policies
