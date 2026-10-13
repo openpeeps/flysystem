@@ -65,7 +65,13 @@
   visibility*: Visibility
   isDir*: bool">FileMetadata</a></li>
 <li><a class="reference" href="#FlysystemStream" title="FlysystemStream = MemFile">FlysystemStream</a></li>
-<li><a class="reference" href="#LocalDriver" title="LocalDriver = ref object of StorageDriver">LocalDriver</a></li>
+<li><a class="reference" href="#LocalDriver" title="LocalDriver = ref object of StorageDriver
+  sroot*: SecureRoot ## The root held open as a directory descriptor plus its canonical path.
+                     ## Every operation descends from this descriptor (see `securejoin`), so
+                     ## containment never depends on re-parsing a string.">LocalDriver</a></li>
+<li><a class="reference" href="#SecureRoot" title="SecureRoot = object
+  fd*: cint
+  path*: string">SecureRoot</a></li>
 <li><a class="reference" href="#StorageDriver" title="StorageDriver = ref object of RootObj
   root*: string">StorageDriver</a></li>
 <li><a class="reference" href="#StorageError" title="StorageError = object of CatchableError">StorageError</a></li>
@@ -225,10 +231,23 @@
   </dd>
 </div>
 <div id="LocalDriver">
-  <dt><pre><a href="#LocalDriver"><span class="Identifier">LocalDriver</span></a> <span class="Other">=</span> <span class="Keyword">ref</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a></pre></dt>
+  <dt><pre><a href="#LocalDriver"><span class="Identifier">LocalDriver</span></a> <span class="Other">=</span> <span class="Keyword">ref</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <a href="#StorageDriver"><span class="Identifier">StorageDriver</span></a>
+  <span class="Identifier">sroot</span><span class="Operator">*</span><span class="Other">:</span> <a href="#SecureRoot"><span class="Identifier">SecureRoot</span></a> <span class="Comment">## The root held open as a directory descriptor plus its canonical path.</span>
+                     <span class="Comment">## Every operation descends from this descriptor (see `securejoin`), so</span>
+                     <span class="Comment">## containment never depends on re-parsing a string.</span></pre></dt>
   <dd>
     
     Filesystem driver using an absolute runtime root. The root is set at runtime (from config/env), NOT at compile time.
+    
+  </dd>
+</div>
+<div id="SecureRoot">
+  <dt><pre><a href="#SecureRoot"><span class="Identifier">SecureRoot</span></a> <span class="Other">=</span> <span class="Keyword">object</span>
+  <span class="Identifier">fd</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">cint</span>
+  <span class="Identifier">path</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">string</span></pre></dt>
+  <dd>
+    
+    A driver root held open as a directory descriptor plus its canonical path. Defined here (rather than in <tt class="docutils literal"><span class="pre"><span class="Identifier">securejoin</span></span></tt>) so driver types can carry it without an import cycle; <tt class="docutils literal"><span class="pre"><span class="Identifier">securejoin</span></span></tt> implements on it.
     
   </dd>
 </div>
@@ -579,7 +598,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-09-15 14:09:55 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-13 10:10:19 UTC</small>
       </div>
     </div>
   </div>

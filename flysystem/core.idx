@@ -6,29 +6,30 @@ nim	Visibility	flysystem/core.html#Visibility	enum Visibility		19
 nim	FileMetadata	flysystem/core.html#FileMetadata	object FileMetadata		25
 nim	StorageDriver	flysystem/core.html#StorageDriver	type StorageDriver		39
 nim	LocalDriver	flysystem/core.html#LocalDriver	type LocalDriver		44
-nim	StorageError	flysystem/core.html#StorageError	object StorageError		48
-nim	abstract	flysystem/core.html#abstract.m,untyped	macro abstract(x: untyped): untyped		50
-nim	write	flysystem/core.html#write.e,StorageDriver,string,string	method write(d: StorageDriver; path, content: string; visibility = visPrivate)		62
-nim	read	flysystem/core.html#read.e,StorageDriver,string	method read(d: StorageDriver; path: string): string		63
-nim	readStream	flysystem/core.html#readStream.e,StorageDriver,string	method readStream(d: StorageDriver; path: string): FlysystemStream		64
-nim	delete	flysystem/core.html#delete.e,StorageDriver,string	method delete(d: StorageDriver; path: string)		65
-nim	exists	flysystem/core.html#exists.e,StorageDriver,string	method exists(d: StorageDriver; path: string): bool		66
-nim	list	flysystem/core.html#list.e,StorageDriver,string	method list(d: StorageDriver; path: string; recursive = false): seq[FileMetadata]		67
-nim	move	flysystem/core.html#move.e,StorageDriver,string,string	method move(d: StorageDriver; src, dest: string)		68
-nim	copy	flysystem/core.html#copy.e,StorageDriver,string,string	method copy(d: StorageDriver; src, dest: string)		69
-nim	makeDir	flysystem/core.html#makeDir.e,StorageDriver,string	method makeDir(d: StorageDriver; path: string)		70
-nim	deleteDir	flysystem/core.html#deleteDir.e,StorageDriver,string	method deleteDir(d: StorageDriver; path: string; force = false)		71
-nim	touch	flysystem/core.html#touch.e,StorageDriver,string	method touch(d: StorageDriver; path: string)		72
-nim	copyDir	flysystem/core.html#copyDir.e,StorageDriver,string,string	method copyDir(d: StorageDriver; src, dest: string)		73
-nim	moveDir	flysystem/core.html#moveDir.e,StorageDriver,string,string	method moveDir(d: StorageDriver; src, dest: string)		74
-nim	search	flysystem/core.html#search.e,StorageDriver,string	method search(d: StorageDriver; pattern: string): seq[string]		75
-nim	setVisibility	flysystem/core.html#setVisibility.e,StorageDriver,string,Visibility	method setVisibility(d: StorageDriver; path: string; visibility: Visibility)		76
-nim	visibility	flysystem/core.html#visibility.e,StorageDriver,string	method visibility(d: StorageDriver; path: string): Visibility		77
-nim	metadata	flysystem/core.html#metadata.e,StorageDriver,string	method metadata(d: StorageDriver; path: string): FileMetadata		78
-nim	size	flysystem/core.html#size.e,StorageDriver,string	method size(d: StorageDriver; path: string): int64		79
-nim	lastModified	flysystem/core.html#lastModified.e,StorageDriver,string	method lastModified(d: StorageDriver; path: string): Time		82
-nim	append	flysystem/core.html#append.e,StorageDriver,string,string	method append(d: StorageDriver; path, content: string)		85
-nim	writeStream	flysystem/core.html#writeStream.e,StorageDriver,string,File	method writeStream(d: StorageDriver; path: string; src: File)		86
-nim	appendStream	flysystem/core.html#appendStream.e,StorageDriver,string,File	method appendStream(d: StorageDriver; path: string; src: File)		87
-nim	checksum	flysystem/core.html#checksum.e,StorageDriver,string	method checksum(d: StorageDriver; path: string): string		88
-nim	mimeType	flysystem/core.html#mimeType.e,StorageDriver,string	method mimeType(d: StorageDriver; path: string): string		89
+nim	SecureRoot	flysystem/core.html#SecureRoot	object SecureRoot		52
+nim	StorageError	flysystem/core.html#StorageError	object StorageError		59
+nim	abstract	flysystem/core.html#abstract.m,untyped	macro abstract(x: untyped): untyped		61
+nim	write	flysystem/core.html#write.e,StorageDriver,string,string	method write(d: StorageDriver; path, content: string; visibility = visPrivate)		73
+nim	read	flysystem/core.html#read.e,StorageDriver,string	method read(d: StorageDriver; path: string): string		74
+nim	readStream	flysystem/core.html#readStream.e,StorageDriver,string	method readStream(d: StorageDriver; path: string): FlysystemStream		75
+nim	delete	flysystem/core.html#delete.e,StorageDriver,string	method delete(d: StorageDriver; path: string)		76
+nim	exists	flysystem/core.html#exists.e,StorageDriver,string	method exists(d: StorageDriver; path: string): bool		77
+nim	list	flysystem/core.html#list.e,StorageDriver,string	method list(d: StorageDriver; path: string; recursive = false): seq[FileMetadata]		78
+nim	move	flysystem/core.html#move.e,StorageDriver,string,string	method move(d: StorageDriver; src, dest: string)		79
+nim	copy	flysystem/core.html#copy.e,StorageDriver,string,string	method copy(d: StorageDriver; src, dest: string)		80
+nim	makeDir	flysystem/core.html#makeDir.e,StorageDriver,string	method makeDir(d: StorageDriver; path: string)		81
+nim	deleteDir	flysystem/core.html#deleteDir.e,StorageDriver,string	method deleteDir(d: StorageDriver; path: string; force = false)		82
+nim	touch	flysystem/core.html#touch.e,StorageDriver,string	method touch(d: StorageDriver; path: string)		83
+nim	copyDir	flysystem/core.html#copyDir.e,StorageDriver,string,string	method copyDir(d: StorageDriver; src, dest: string)		84
+nim	moveDir	flysystem/core.html#moveDir.e,StorageDriver,string,string	method moveDir(d: StorageDriver; src, dest: string)		85
+nim	search	flysystem/core.html#search.e,StorageDriver,string	method search(d: StorageDriver; pattern: string): seq[string]		86
+nim	setVisibility	flysystem/core.html#setVisibility.e,StorageDriver,string,Visibility	method setVisibility(d: StorageDriver; path: string; visibility: Visibility)		87
+nim	visibility	flysystem/core.html#visibility.e,StorageDriver,string	method visibility(d: StorageDriver; path: string): Visibility		88
+nim	metadata	flysystem/core.html#metadata.e,StorageDriver,string	method metadata(d: StorageDriver; path: string): FileMetadata		89
+nim	size	flysystem/core.html#size.e,StorageDriver,string	method size(d: StorageDriver; path: string): int64		90
+nim	lastModified	flysystem/core.html#lastModified.e,StorageDriver,string	method lastModified(d: StorageDriver; path: string): Time		93
+nim	append	flysystem/core.html#append.e,StorageDriver,string,string	method append(d: StorageDriver; path, content: string)		96
+nim	writeStream	flysystem/core.html#writeStream.e,StorageDriver,string,File	method writeStream(d: StorageDriver; path: string; src: File)		97
+nim	appendStream	flysystem/core.html#appendStream.e,StorageDriver,string,File	method appendStream(d: StorageDriver; path: string; src: File)		98
+nim	checksum	flysystem/core.html#checksum.e,StorageDriver,string	method checksum(d: StorageDriver; path: string): string		99
+nim	mimeType	flysystem/core.html#mimeType.e,StorageDriver,string	method mimeType(d: StorageDriver; path: string): string		100

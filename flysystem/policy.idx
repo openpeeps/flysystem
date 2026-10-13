@@ -1,32 +1,32 @@
 nimTitle	policy	flysystem/policy.html	module flysystem/policy		0
 nim	FilesystemPolicyError	flysystem/policy.html#FilesystemPolicyError	object FilesystemPolicyError		13
 nim	PolicyRules	flysystem/policy.html#PolicyRules	object PolicyRules		19
-nim	FilesystemPolicy	flysystem/policy.html#FilesystemPolicy	type FilesystemPolicy		38
-nim	defaultPolicyRules	flysystem/policy.html#defaultPolicyRules	proc defaultPolicyRules(): PolicyRules		45
-nim	newFilesystemPolicy	flysystem/policy.html#newFilesystemPolicy,StorageDriver,PolicyRules	proc newFilesystemPolicy(inner: StorageDriver;\n                    rules: PolicyRules = defaultPolicyRules()): FilesystemPolicy		49
-nim	inner	flysystem/policy.html#inner,FilesystemPolicy	proc inner(p: FilesystemPolicy): StorageDriver		54
-nim	rules	flysystem/policy.html#rules,FilesystemPolicy	proc rules(p: FilesystemPolicy): PolicyRules		58
-nim	read	flysystem/policy.html#read.e,FilesystemPolicy,string	method read(p: FilesystemPolicy; path: string): string		131
-nim	readStream	flysystem/policy.html#readStream.e,FilesystemPolicy,string	method readStream(p: FilesystemPolicy; path: string): FlysystemStream		135
-nim	exists	flysystem/policy.html#exists.e,FilesystemPolicy,string	method exists(p: FilesystemPolicy; path: string): bool		139
-nim	list	flysystem/policy.html#list.e,FilesystemPolicy,string	method list(p: FilesystemPolicy; path: string; recursive = false): seq[FileMetadata]		143
-nim	search	flysystem/policy.html#search.e,FilesystemPolicy,string	method search(p: FilesystemPolicy; pattern: string): seq[string]		152
-nim	visibility	flysystem/policy.html#visibility.e,FilesystemPolicy,string	method visibility(p: FilesystemPolicy; path: string): Visibility		160
-nim	metadata	flysystem/policy.html#metadata.e,FilesystemPolicy,string	method metadata(p: FilesystemPolicy; path: string): FileMetadata		164
-nim	size	flysystem/policy.html#size.e,FilesystemPolicy,string	method size(p: FilesystemPolicy; path: string): int64		168
-nim	lastModified	flysystem/policy.html#lastModified.e,FilesystemPolicy,string	method lastModified(p: FilesystemPolicy; path: string): Time		172
-nim	checksum	flysystem/policy.html#checksum.e,FilesystemPolicy,string	method checksum(p: FilesystemPolicy; path: string): string		176
-nim	mimeType	flysystem/policy.html#mimeType.e,FilesystemPolicy,string	method mimeType(p: FilesystemPolicy; path: string): string		180
-nim	write	flysystem/policy.html#write.e,FilesystemPolicy,string,string	method write(p: FilesystemPolicy; path, content: string; visibility = visPrivate)		187
-nim	append	flysystem/policy.html#append.e,FilesystemPolicy,string,string	method append(p: FilesystemPolicy; path, content: string)		195
-nim	writeStream	flysystem/policy.html#writeStream.e,FilesystemPolicy,string,File	method writeStream(p: FilesystemPolicy; path: string; src: File)		205
-nim	appendStream	flysystem/policy.html#appendStream.e,FilesystemPolicy,string,File	method appendStream(p: FilesystemPolicy; path: string; src: File)		212
-nim	delete	flysystem/policy.html#delete.e,FilesystemPolicy,string	method delete(p: FilesystemPolicy; path: string)		222
-nim	move	flysystem/policy.html#move.e,FilesystemPolicy,string,string	method move(p: FilesystemPolicy; src, dest: string)		227
-nim	copy	flysystem/policy.html#copy.e,FilesystemPolicy,string,string	method copy(p: FilesystemPolicy; src, dest: string)		234
-nim	makeDir	flysystem/policy.html#makeDir.e,FilesystemPolicy,string	method makeDir(p: FilesystemPolicy; path: string)		241
-nim	deleteDir	flysystem/policy.html#deleteDir.e,FilesystemPolicy,string	method deleteDir(p: FilesystemPolicy; path: string; force = false)		247
-nim	touch	flysystem/policy.html#touch.e,FilesystemPolicy,string	method touch(p: FilesystemPolicy; path: string)		252
-nim	copyDir	flysystem/policy.html#copyDir.e,FilesystemPolicy,string,string	method copyDir(p: FilesystemPolicy; src, dest: string)		258
-nim	moveDir	flysystem/policy.html#moveDir.e,FilesystemPolicy,string,string	method moveDir(p: FilesystemPolicy; src, dest: string)		266
-nim	setVisibility	flysystem/policy.html#setVisibility.e,FilesystemPolicy,string,Visibility	method setVisibility(p: FilesystemPolicy; path: string; visibility: Visibility)		274
+nim	FilesystemPolicy	flysystem/policy.html#FilesystemPolicy	type FilesystemPolicy		40
+nim	defaultPolicyRules	flysystem/policy.html#defaultPolicyRules	proc defaultPolicyRules(): PolicyRules		47
+nim	newFilesystemPolicy	flysystem/policy.html#newFilesystemPolicy,StorageDriver,PolicyRules	proc newFilesystemPolicy(inner: StorageDriver;\n                    rules: PolicyRules = defaultPolicyRules()): FilesystemPolicy		51
+nim	inner	flysystem/policy.html#inner,FilesystemPolicy	proc inner(p: FilesystemPolicy): StorageDriver		56
+nim	rules	flysystem/policy.html#rules,FilesystemPolicy	proc rules(p: FilesystemPolicy): PolicyRules		60
+nim	read	flysystem/policy.html#read.e,FilesystemPolicy,string	method read(p: FilesystemPolicy; path: string): string		175
+nim	readStream	flysystem/policy.html#readStream.e,FilesystemPolicy,string	method readStream(p: FilesystemPolicy; path: string): FlysystemStream		181
+nim	exists	flysystem/policy.html#exists.e,FilesystemPolicy,string	method exists(p: FilesystemPolicy; path: string): bool		187
+nim	list	flysystem/policy.html#list.e,FilesystemPolicy,string	method list(p: FilesystemPolicy; path: string; recursive = false): seq[FileMetadata]		195
+nim	search	flysystem/policy.html#search.e,FilesystemPolicy,string	method search(p: FilesystemPolicy; pattern: string): seq[string]		202
+nim	visibility	flysystem/policy.html#visibility.e,FilesystemPolicy,string	method visibility(p: FilesystemPolicy; path: string): Visibility		208
+nim	metadata	flysystem/policy.html#metadata.e,FilesystemPolicy,string	method metadata(p: FilesystemPolicy; path: string): FileMetadata		213
+nim	size	flysystem/policy.html#size.e,FilesystemPolicy,string	method size(p: FilesystemPolicy; path: string): int64		218
+nim	lastModified	flysystem/policy.html#lastModified.e,FilesystemPolicy,string	method lastModified(p: FilesystemPolicy; path: string): Time		223
+nim	checksum	flysystem/policy.html#checksum.e,FilesystemPolicy,string	method checksum(p: FilesystemPolicy; path: string): string		228
+nim	mimeType	flysystem/policy.html#mimeType.e,FilesystemPolicy,string	method mimeType(p: FilesystemPolicy; path: string): string		233
+nim	write	flysystem/policy.html#write.e,FilesystemPolicy,string,string	method write(p: FilesystemPolicy; path, content: string; visibility = visPrivate)		241
+nim	append	flysystem/policy.html#append.e,FilesystemPolicy,string,string	method append(p: FilesystemPolicy; path, content: string)		249
+nim	writeStream	flysystem/policy.html#writeStream.e,FilesystemPolicy,string,File	method writeStream(p: FilesystemPolicy; path: string; src: File)		259
+nim	appendStream	flysystem/policy.html#appendStream.e,FilesystemPolicy,string,File	method appendStream(p: FilesystemPolicy; path: string; src: File)		266
+nim	delete	flysystem/policy.html#delete.e,FilesystemPolicy,string	method delete(p: FilesystemPolicy; path: string)		276
+nim	move	flysystem/policy.html#move.e,FilesystemPolicy,string,string	method move(p: FilesystemPolicy; src, dest: string)		281
+nim	copy	flysystem/policy.html#copy.e,FilesystemPolicy,string,string	method copy(p: FilesystemPolicy; src, dest: string)		288
+nim	makeDir	flysystem/policy.html#makeDir.e,FilesystemPolicy,string	method makeDir(p: FilesystemPolicy; path: string)		295
+nim	deleteDir	flysystem/policy.html#deleteDir.e,FilesystemPolicy,string	method deleteDir(p: FilesystemPolicy; path: string; force = false)		301
+nim	touch	flysystem/policy.html#touch.e,FilesystemPolicy,string	method touch(p: FilesystemPolicy; path: string)		306
+nim	copyDir	flysystem/policy.html#copyDir.e,FilesystemPolicy,string,string	method copyDir(p: FilesystemPolicy; src, dest: string)		312
+nim	moveDir	flysystem/policy.html#moveDir.e,FilesystemPolicy,string,string	method moveDir(p: FilesystemPolicy; src, dest: string)		320
+nim	setVisibility	flysystem/policy.html#setVisibility.e,FilesystemPolicy,string,Visibility	method setVisibility(p: FilesystemPolicy; path: string; visibility: Visibility)		328

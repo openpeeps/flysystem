@@ -1,0 +1,41 @@
+nimTitle	securejoin	flysystem/securejoin.html	module flysystem/securejoin		0
+nim	SandboxError	flysystem/securejoin.html#SandboxError	object SandboxError		50
+nim	sjO_NOFOLLOW	flysystem/securejoin.html#sjO_NOFOLLOW	var sjO_NOFOLLOW		92
+nim	sjO_DIRECTORY	flysystem/securejoin.html#sjO_DIRECTORY	var sjO_DIRECTORY		93
+nim	sjAT_SYMLINK_NOFOLLOW	flysystem/securejoin.html#sjAT_SYMLINK_NOFOLLOW	var sjAT_SYMLINK_NOFOLLOW		94
+nim	sjAT_REMOVEDIR	flysystem/securejoin.html#sjAT_REMOVEDIR	var sjAT_REMOVEDIR		96
+nim	sjS_IROTH	flysystem/securejoin.html#sjS_IROTH	var sjS_IROTH		97
+nim	openSecureRoot	flysystem/securejoin.html#openSecureRoot,string	proc openSecureRoot(path: string): SecureRoot		119
+nim	closeSecureRoot	flysystem/securejoin.html#closeSecureRoot,SecureRoot	proc closeSecureRoot(r: var SecureRoot)		143
+nim	openSecure	flysystem/securejoin.html#openSecure,SecureRoot,string,cint	proc openSecure(root: SecureRoot; relpath: string; flags: cint;\n           mode = Mode(0o000000000666)): cint		274
+nim	openSecureParent	flysystem/securejoin.html#openSecureParent,SecureRoot,string	proc openSecureParent(root: SecureRoot; relpath: string): tuple[dirFd: cint,\n    base: string]		287
+nim	lstatSecure	flysystem/securejoin.html#lstatSecure,SecureRoot,string	proc lstatSecure(root: SecureRoot; relpath: string): tuple[present: bool, st: Stat]		306
+nim	readAllFd	flysystem/securejoin.html#readAllFd,cint	proc readAllFd(fd: cint): string		320
+nim	createFileIn	flysystem/securejoin.html#createFileIn,cint,string	proc createFileIn(dirFd: cint; base: string; mode = Mode(0o000000000666)): cint		332
+nim	writeBufFd	flysystem/securejoin.html#writeBufFd,cint,openArray[byte],int	proc writeBufFd(fd: cint; buf: openArray[byte]; n: int)		341
+nim	writeAllFd	flysystem/securejoin.html#writeAllFd,cint,string	proc writeAllFd(fd: cint; s: string)		351
+nim	mmapFd	flysystem/securejoin.html#mmapFd,cint,int	proc mmapFd(fd: cint; size: int): pointer		360
+nim	DirEntry	flysystem/securejoin.html#DirEntry	tuple DirEntry		368
+nim	listDirFd	flysystem/securejoin.html#listDirFd,cint	proc listDirFd(dirFd: cint): seq[DirEntry]		372
+nim	fullMtime	flysystem/securejoin.html#fullMtime,Stat	proc fullMtime(st: Stat): times.Time		405
+nim	statMeta	flysystem/securejoin.html#statMeta,string,Stat	proc statMeta(relpath: string; st: Stat): FileMetadata		415
+nim	fstatFd	flysystem/securejoin.html#fstatFd,cint	proc fstatFd(fd: cint): Stat		428
+nim	tmpBase	flysystem/securejoin.html#tmpBase,string	proc tmpBase(base: string): string		436
+nim	ensureDirsSecure	flysystem/securejoin.html#ensureDirsSecure,SecureRoot,string	proc ensureDirsSecure(root: SecureRoot; relpath: string)		442
+nim	atomicWriteSecure	flysystem/securejoin.html#atomicWriteSecure,SecureRoot,string,string,Mode	proc atomicWriteSecure(root: SecureRoot; relpath, content: string; mode: Mode)		478
+nim	removeSecure	flysystem/securejoin.html#removeSecure,SecureRoot,string	proc removeSecure(root: SecureRoot; relpath: string)		512
+nim	normalizeRel	flysystem/securejoin.html#normalizeRel,SecureRoot,string	proc normalizeRel(root: SecureRoot; relpath: string): string		530
+nim	openTempIn	flysystem/securejoin.html#openTempIn,cint,string	proc openTempIn(dirFd: cint; base: string): tuple[fd: cint, tmp: string]		535
+nim	commitTemp	flysystem/securejoin.html#commitTemp,cint,string,string	proc commitTemp(dirFd: cint; tmp, base: string)		547
+nim	ensureParentSecure	flysystem/securejoin.html#ensureParentSecure,SecureRoot,string	proc ensureParentSecure(root: SecureRoot; relpath: string)		556
+nim	copyFileSecure	flysystem/securejoin.html#copyFileSecure,SecureRoot,string,string	proc copyFileSecure(root: SecureRoot; srcRel, dstRel: string)		563
+nim	listSecure	flysystem/securejoin.html#listSecure,SecureRoot,string,bool	proc listSecure(root: SecureRoot; relpath: string; recursive: bool): seq[\n    tuple[rel: string, st: Stat]]		594
+nim	renameSecure	flysystem/securejoin.html#renameSecure,SecureRoot,string,string	proc renameSecure(root: SecureRoot; srcRel, dstRel: string)		628
+nim	removeTreeSecure	flysystem/securejoin.html#removeTreeSecure,SecureRoot,string	proc removeTreeSecure(root: SecureRoot; relpath: string)		641
+nim	copyDirSecure	flysystem/securejoin.html#copyDirSecure,SecureRoot,string,string	proc copyDirSecure(root: SecureRoot; srcRel, dstRel: string)		664
+nim	sandboxPassthrough	flysystem/securejoin.html#sandboxPassthrough.t,string,string,untyped	template sandboxPassthrough(op: string; path: string; body: untyped): untyped		717
+nim	symlinkIn	flysystem/securejoin.html#symlinkIn,cint,string,string	proc symlinkIn(dirFd: cint; target, base: string)		729
+nim	readlinkIn	flysystem/securejoin.html#readlinkIn,cint,string	proc readlinkIn(dirFd: cint; base: string): string		735
+nim	checkLexicalContained	flysystem/securejoin.html#checkLexicalContained,SecureRoot,string	proc checkLexicalContained(root: SecureRoot; relpath: string)		739
+nim	touchSecure	flysystem/securejoin.html#touchSecure,SecureRoot,string	proc touchSecure(root: SecureRoot; relpath: string)		747
+nim	searchSecure	flysystem/securejoin.html#searchSecure,SecureRoot,string	proc searchSecure(root: SecureRoot; pattern: string): seq[string]		762

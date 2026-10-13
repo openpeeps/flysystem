@@ -1,36 +1,37 @@
 nimTitle	local	flysystem/local.html	module flysystem/local		0
-nim	newLocalDriver	flysystem/local.html#newLocalDriver,string	proc newLocalDriver(root: string): LocalDriver		47
-nim	write	flysystem/local.html#write.e,LocalDriver,string,string	method write(d: LocalDriver; path, content: string; visibility = visPrivate)		54
-nim	read	flysystem/local.html#read.e,LocalDriver,string	method read(d: LocalDriver; path: string): string		69
-nim	readStream	flysystem/local.html#readStream.e,LocalDriver,string	method readStream(d: LocalDriver; path: string): FlysystemStream		79
-nim	writeStream	flysystem/local.html#writeStream.e,LocalDriver,string,File	method writeStream(d: LocalDriver; path: string; src: File)		101
-nim	append	flysystem/local.html#append.e,LocalDriver,string,string	method append(d: LocalDriver; path, content: string)		116
-nim	appendStream	flysystem/local.html#appendStream.e,LocalDriver,string,File	method appendStream(d: LocalDriver; path: string; src: File)		129
-nim	delete	flysystem/local.html#delete.e,LocalDriver,string	method delete(d: LocalDriver; path: string)		143
-nim	exists	flysystem/local.html#exists.e,LocalDriver,string	method exists(d: LocalDriver; path: string): bool		157
-nim	list	flysystem/local.html#list.e,LocalDriver,string	method list(d: LocalDriver; path: string; recursive = false): seq[FileMetadata]		177
-nim	move	flysystem/local.html#move.e,LocalDriver,string,string	method move(d: LocalDriver; src, dest: string)		195
-nim	copy	flysystem/local.html#copy.e,LocalDriver,string,string	method copy(d: LocalDriver; src, dest: string)		207
-nim	makeDir	flysystem/local.html#makeDir.e,LocalDriver,string	method makeDir(d: LocalDriver; path: string)		219
-nim	deleteDir	flysystem/local.html#deleteDir.e,LocalDriver,string	method deleteDir(d: LocalDriver; path: string; force = false)		228
-nim	setVisibility	flysystem/local.html#setVisibility.e,LocalDriver,string,Visibility	method setVisibility(d: LocalDriver; path: string; visibility: Visibility)		247
-nim	visibility	flysystem/local.html#visibility.e,LocalDriver,string	method visibility(d: LocalDriver; path: string): Visibility		261
-nim	metadata	flysystem/local.html#metadata.e,LocalDriver,string	method metadata(d: LocalDriver; path: string): FileMetadata		270
-nim	size	flysystem/local.html#size.e,LocalDriver,string	method size(d: LocalDriver; path: string): int64		284
-nim	lastModified	flysystem/local.html#lastModified.e,LocalDriver,string	method lastModified(d: LocalDriver; path: string): times.Time		288
-nim	checksum	flysystem/local.html#checksum.e,LocalDriver,string	method checksum(d: LocalDriver; path: string): string		292
-nim	mimeType	flysystem/local.html#mimeType.e,LocalDriver,string	method mimeType(d: LocalDriver; path: string): string		296
-nim	touch	flysystem/local.html#touch.e,LocalDriver,string	method touch(d: LocalDriver; path: string)		304
-nim	readLines	flysystem/local.html#readLines.i,LocalDriver,string	iterator readLines(d: LocalDriver; path: string): string		316
-nim	copyDir	flysystem/local.html#copyDir.e,LocalDriver,string,string	method copyDir(d: LocalDriver; src, dest: string)		353
-nim	moveDir	flysystem/local.html#moveDir.e,LocalDriver,string,string	method moveDir(d: LocalDriver; src, dest: string)		372
-nim	createSymlink	flysystem/local.html#createSymlink.e,LocalDriver,string,string	method createSymlink(d: LocalDriver; path, target: string)		383
-nim	isSymlink	flysystem/local.html#isSymlink.e,LocalDriver,string	method isSymlink(d: LocalDriver; path: string): bool		393
-nim	readLink	flysystem/local.html#readLink.e,LocalDriver,string	method readLink(d: LocalDriver; path: string): string		401
-nim	withLock	flysystem/local.html#withLock.t,LocalDriver,string,untyped	template withLock(d: LocalDriver; path: string; body: untyped)		409
-nim	search	flysystem/local.html#search.e,LocalDriver,string	method search(d: LocalDriver; pattern: string): seq[string]		436
-nim	copyFromHost	flysystem/local.html#copyFromHost.e,LocalDriver,string,string	method copyFromHost(d: LocalDriver; srcAbs, destRel: string)		447
-nim	importFrom	flysystem/local.html#importFrom.e,LocalDriver,StorageDriver,string,string	method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)		475
-nim	diskUsage	flysystem/local.html#diskUsage.e,LocalDriver	method diskUsage(d: LocalDriver): tuple[total, free, used: int64]		505
-nim	chmod	flysystem/local.html#chmod.e,LocalDriver,string,int	method chmod(d: LocalDriver; path: string; mode: int)		519
-nim	chown	flysystem/local.html#chown.e,LocalDriver,string,int,int	method chown(d: LocalDriver; path: string; uid, gid: int)		529
+nim	newLocalDriver	flysystem/local.html#newLocalDriver,string	proc newLocalDriver(root: string): LocalDriver		26
+nim	closeDriver	flysystem/local.html#closeDriver,LocalDriver	proc closeDriver(d: LocalDriver)		34
+nim	write	flysystem/local.html#write.e,LocalDriver,string,string	method write(d: LocalDriver; path, content: string; visibility = visPrivate)		39
+nim	read	flysystem/local.html#read.e,LocalDriver,string	method read(d: LocalDriver; path: string): string		48
+nim	readStream	flysystem/local.html#readStream.e,LocalDriver,string	method readStream(d: LocalDriver; path: string): FlysystemStream		57
+nim	writeStream	flysystem/local.html#writeStream.e,LocalDriver,string,File	method writeStream(d: LocalDriver; path: string; src: File)		83
+nim	append	flysystem/local.html#append.e,LocalDriver,string,string	method append(d: LocalDriver; path, content: string)		103
+nim	appendStream	flysystem/local.html#appendStream.e,LocalDriver,string,File	method appendStream(d: LocalDriver; path: string; src: File)		113
+nim	delete	flysystem/local.html#delete.e,LocalDriver,string	method delete(d: LocalDriver; path: string)		128
+nim	exists	flysystem/local.html#exists.e,LocalDriver,string	method exists(d: LocalDriver; path: string): bool		136
+nim	list	flysystem/local.html#list.e,LocalDriver,string	method list(d: LocalDriver; path: string; recursive = false): seq[FileMetadata]		143
+nim	move	flysystem/local.html#move.e,LocalDriver,string,string	method move(d: LocalDriver; src, dest: string)		152
+nim	copy	flysystem/local.html#copy.e,LocalDriver,string,string	method copy(d: LocalDriver; src, dest: string)		160
+nim	makeDir	flysystem/local.html#makeDir.e,LocalDriver,string	method makeDir(d: LocalDriver; path: string)		168
+nim	deleteDir	flysystem/local.html#deleteDir.e,LocalDriver,string	method deleteDir(d: LocalDriver; path: string; force = false)		174
+nim	setVisibility	flysystem/local.html#setVisibility.e,LocalDriver,string,Visibility	method setVisibility(d: LocalDriver; path: string; visibility: Visibility)		189
+nim	visibility	flysystem/local.html#visibility.e,LocalDriver,string	method visibility(d: LocalDriver; path: string): Visibility		199
+nim	metadata	flysystem/local.html#metadata.e,LocalDriver,string	method metadata(d: LocalDriver; path: string): FileMetadata		208
+nim	size	flysystem/local.html#size.e,LocalDriver,string	method size(d: LocalDriver; path: string): int64		216
+nim	lastModified	flysystem/local.html#lastModified.e,LocalDriver,string	method lastModified(d: LocalDriver; path: string): times.Time		220
+nim	checksum	flysystem/local.html#checksum.e,LocalDriver,string	method checksum(d: LocalDriver; path: string): string		224
+nim	mimeType	flysystem/local.html#mimeType.e,LocalDriver,string	method mimeType(d: LocalDriver; path: string): string		228
+nim	touch	flysystem/local.html#touch.e,LocalDriver,string	method touch(d: LocalDriver; path: string)		236
+nim	readLines	flysystem/local.html#readLines.i,LocalDriver,string	iterator readLines(d: LocalDriver; path: string): string		242
+nim	copyDir	flysystem/local.html#copyDir.e,LocalDriver,string,string	method copyDir(d: LocalDriver; src, dest: string)		272
+nim	moveDir	flysystem/local.html#moveDir.e,LocalDriver,string,string	method moveDir(d: LocalDriver; src, dest: string)		278
+nim	createSymlink	flysystem/local.html#createSymlink.e,LocalDriver,string,string	method createSymlink(d: LocalDriver; path, target: string)		284
+nim	isSymlink	flysystem/local.html#isSymlink.e,LocalDriver,string	method isSymlink(d: LocalDriver; path: string): bool		295
+nim	readLink	flysystem/local.html#readLink.e,LocalDriver,string	method readLink(d: LocalDriver; path: string): string		301
+nim	withLock	flysystem/local.html#withLock.t,LocalDriver,string,untyped	template withLock(d: LocalDriver; path: string; body: untyped)		314
+nim	search	flysystem/local.html#search.e,LocalDriver,string	method search(d: LocalDriver; pattern: string): seq[string]		342
+nim	copyFromHost	flysystem/local.html#copyFromHost.e,LocalDriver,string,string	method copyFromHost(d: LocalDriver; srcAbs, destRel: string)		348
+nim	importFrom	flysystem/local.html#importFrom.e,LocalDriver,StorageDriver,string,string	method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)		387
+nim	diskUsage	flysystem/local.html#diskUsage.e,LocalDriver	method diskUsage(d: LocalDriver): tuple[total, free, used: int64]		443
+nim	chmod	flysystem/local.html#chmod.e,LocalDriver,string,int	method chmod(d: LocalDriver; path: string; mode: int)		457
+nim	chown	flysystem/local.html#chown.e,LocalDriver,string,int,int	method chown(d: LocalDriver; path: string; uid, gid: int)		469

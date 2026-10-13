@@ -28,7 +28,7 @@
     <label for="nav-toggle" id="nav-overlay"></label>
     <div class="container">
       <h1 class="title">Index</h1>
-      Modules: <a href="index.html">flysystem</a>, <a href="flysystem/core.html">flysystem/core</a>, <a href="flysystem/filesystem.html">flysystem/filesystem</a>, <a href="flysystem/local.html">flysystem/local</a>, <a href="flysystem/policy.html">flysystem/policy</a>.<br/><p /><h2>API symbols</h2>
+      Modules: <a href="index.html">flysystem</a>, <a href="flysystem/core.html">flysystem/core</a>, <a href="flysystem/filesystem.html">flysystem/filesystem</a>, <a href="flysystem/local.html">flysystem/local</a>, <a href="flysystem/policy.html">flysystem/policy</a>, <a href="flysystem/securejoin.html">flysystem/securejoin</a>.<br/><p /><h2>API symbols</h2>
 <dl><dt><a name="abstract" href="#abstract"><span>abstract:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: macro abstract(x: untyped): untyped" href="flysystem/core.html#abstract.m%2Cuntyped">core: macro abstract(x: untyped): untyped</a></li>
@@ -55,6 +55,14 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method appendStream(p: FilesystemPolicy; path: string; src: File)" href="flysystem/policy.html#appendStream.e%2CFilesystemPolicy%2Cstring%2CFile">policy: method appendStream(p: FilesystemPolicy; path: string; src: File)</a></li>
           </ul></dd>
+<dt><a name="atomicWriteSecure" href="#atomicWriteSecure"><span>atomicWriteSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc atomicWriteSecure(root: SecureRoot; relpath, content: string; mode: Mode)" href="flysystem/securejoin.html#atomicWriteSecure%2CSecureRoot%2Cstring%2Cstring%2CMode">securejoin: proc atomicWriteSecure(root: SecureRoot; relpath, content: string; mode: Mode)</a></li>
+          </ul></dd>
+<dt><a name="checkLexicalContained" href="#checkLexicalContained"><span>checkLexicalContained:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc checkLexicalContained(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#checkLexicalContained%2CSecureRoot%2Cstring">securejoin: proc checkLexicalContained(root: SecureRoot; relpath: string)</a></li>
+          </ul></dd>
 <dt><a name="checksum" href="#checksum"><span>checksum:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: method checksum(d: StorageDriver; path: string): string" href="flysystem/core.html#checksum.e%2CStorageDriver%2Cstring">core: method checksum(d: StorageDriver; path: string): string</a></li>
@@ -70,6 +78,18 @@
 <dt><a name="chown" href="#chown"><span>chown:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method chown(d: LocalDriver; path: string; uid, gid: int)" href="flysystem/local.html#chown.e%2CLocalDriver%2Cstring%2Cint%2Cint">local: method chown(d: LocalDriver; path: string; uid, gid: int)</a></li>
+          </ul></dd>
+<dt><a name="closeDriver" href="#closeDriver"><span>closeDriver:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="local: proc closeDriver(d: LocalDriver)" href="flysystem/local.html#closeDriver%2CLocalDriver">local: proc closeDriver(d: LocalDriver)</a></li>
+          </ul></dd>
+<dt><a name="closeSecureRoot" href="#closeSecureRoot"><span>closeSecureRoot:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc closeSecureRoot(r: var SecureRoot)" href="flysystem/securejoin.html#closeSecureRoot%2CSecureRoot">securejoin: proc closeSecureRoot(r: var SecureRoot)</a></li>
+          </ul></dd>
+<dt><a name="commitTemp" href="#commitTemp"><span>commitTemp:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc commitTemp(dirFd: cint; tmp, base: string)" href="flysystem/securejoin.html#commitTemp%2Ccint%2Cstring%2Cstring">securejoin: proc commitTemp(dirFd: cint; tmp, base: string)</a></li>
           </ul></dd>
 <dt><a name="copy" href="#copy"><span>copy:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -87,9 +107,21 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method copyDir(p: FilesystemPolicy; src, dest: string)" href="flysystem/policy.html#copyDir.e%2CFilesystemPolicy%2Cstring%2Cstring">policy: method copyDir(p: FilesystemPolicy; src, dest: string)</a></li>
           </ul></dd>
+<dt><a name="copyDirSecure" href="#copyDirSecure"><span>copyDirSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc copyDirSecure(root: SecureRoot; srcRel, dstRel: string)" href="flysystem/securejoin.html#copyDirSecure%2CSecureRoot%2Cstring%2Cstring">securejoin: proc copyDirSecure(root: SecureRoot; srcRel, dstRel: string)</a></li>
+          </ul></dd>
+<dt><a name="copyFileSecure" href="#copyFileSecure"><span>copyFileSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc copyFileSecure(root: SecureRoot; srcRel, dstRel: string)" href="flysystem/securejoin.html#copyFileSecure%2CSecureRoot%2Cstring%2Cstring">securejoin: proc copyFileSecure(root: SecureRoot; srcRel, dstRel: string)</a></li>
+          </ul></dd>
 <dt><a name="copyFromHost" href="#copyFromHost"><span>copyFromHost:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method copyFromHost(d: LocalDriver; srcAbs, destRel: string)" href="flysystem/local.html#copyFromHost.e%2CLocalDriver%2Cstring%2Cstring">local: method copyFromHost(d: LocalDriver; srcAbs, destRel: string)</a></li>
+          </ul></dd>
+<dt><a name="createFileIn" href="#createFileIn"><span>createFileIn:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc createFileIn(dirFd: cint; base: string; mode = Mode(0o000000000666)): cint" href="flysystem/securejoin.html#createFileIn%2Ccint%2Cstring">securejoin: proc createFileIn(dirFd: cint; base: string; mode = Mode(0o000000000666)): cint</a></li>
           </ul></dd>
 <dt><a name="createSymlink" href="#createSymlink"><span>createSymlink:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -117,6 +149,10 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method deleteDir(p: FilesystemPolicy; path: string; force = false)" href="flysystem/policy.html#deleteDir.e%2CFilesystemPolicy%2Cstring">policy: method deleteDir(p: FilesystemPolicy; path: string; force = false)</a></li>
           </ul></dd>
+<dt><a name="DirEntry" href="#DirEntry"><span>DirEntry:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: tuple DirEntry" href="flysystem/securejoin.html#DirEntry">securejoin: tuple DirEntry</a></li>
+          </ul></dd>
 <dt><a name="disk" href="#disk"><span>disk:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="filesystem: proc disk(fs: Filesystem; name = &quot;&quot;): StorageDriver" href="flysystem/filesystem.html#disk%2CFilesystem%2Cstring">filesystem: proc disk(fs: Filesystem; name = &quot;&quot;): StorageDriver</a></li>
@@ -128,6 +164,14 @@
 <dt><a name="diskUsage" href="#diskUsage"><span>diskUsage:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method diskUsage(d: LocalDriver): tuple[total, free, used: int64]" href="flysystem/local.html#diskUsage.e%2CLocalDriver">local: method diskUsage(d: LocalDriver): tuple[total, free, used: int64]</a></li>
+          </ul></dd>
+<dt><a name="ensureDirsSecure" href="#ensureDirsSecure"><span>ensureDirsSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc ensureDirsSecure(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#ensureDirsSecure%2CSecureRoot%2Cstring">securejoin: proc ensureDirsSecure(root: SecureRoot; relpath: string)</a></li>
+          </ul></dd>
+<dt><a name="ensureParentSecure" href="#ensureParentSecure"><span>ensureParentSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc ensureParentSecure(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#ensureParentSecure%2CSecureRoot%2Cstring">securejoin: proc ensureParentSecure(root: SecureRoot; relpath: string)</a></li>
           </ul></dd>
 <dt><a name="exists" href="#exists"><span>exists:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -159,6 +203,14 @@
 <li><a class="reference external"
           data-doc-search-tag="core: type FlysystemStream" href="flysystem/core.html#FlysystemStream">core: type FlysystemStream</a></li>
           </ul></dd>
+<dt><a name="fstatFd" href="#fstatFd"><span>fstatFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc fstatFd(fd: cint): Stat" href="flysystem/securejoin.html#fstatFd%2Ccint">securejoin: proc fstatFd(fd: cint): Stat</a></li>
+          </ul></dd>
+<dt><a name="fullMtime" href="#fullMtime"><span>fullMtime:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc fullMtime(st: Stat): times.Time" href="flysystem/securejoin.html#fullMtime%2CStat">securejoin: proc fullMtime(st: Stat): times.Time</a></li>
+          </ul></dd>
 <dt><a name="importFrom" href="#importFrom"><span>importFrom:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)" href="flysystem/local.html#importFrom.e%2CLocalDriver%2CStorageDriver%2Cstring%2Cstring">local: method importFrom(d: LocalDriver; srcDriver: StorageDriver; srcRel, destRel: string)</a></li>
@@ -187,9 +239,23 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method list(p: FilesystemPolicy; path: string; recursive = false): seq[FileMetadata]" href="flysystem/policy.html#list.e%2CFilesystemPolicy%2Cstring">policy: method list(p: FilesystemPolicy; path: string; recursive = false): seq[FileMetadata]</a></li>
           </ul></dd>
+<dt><a name="listDirFd" href="#listDirFd"><span>listDirFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc listDirFd(dirFd: cint): seq[DirEntry]" href="flysystem/securejoin.html#listDirFd%2Ccint">securejoin: proc listDirFd(dirFd: cint): seq[DirEntry]</a></li>
+          </ul></dd>
+<dt><a name="listSecure" href="#listSecure"><span>listSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc listSecure(root: SecureRoot; relpath: string; recursive: bool): seq[
+    tuple[rel: string, st: Stat]]" href="flysystem/securejoin.html#listSecure%2CSecureRoot%2Cstring%2Cbool">securejoin: proc listSecure(root: SecureRoot; relpath: string; recursive: bool): seq[
+    tuple[rel: string, st: Stat]]</a></li>
+          </ul></dd>
 <dt><a name="LocalDriver" href="#LocalDriver"><span>LocalDriver:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: type LocalDriver" href="flysystem/core.html#LocalDriver">core: type LocalDriver</a></li>
+          </ul></dd>
+<dt><a name="lstatSecure" href="#lstatSecure"><span>lstatSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc lstatSecure(root: SecureRoot; relpath: string): tuple[present: bool, st: Stat]" href="flysystem/securejoin.html#lstatSecure%2CSecureRoot%2Cstring">securejoin: proc lstatSecure(root: SecureRoot; relpath: string): tuple[present: bool, st: Stat]</a></li>
           </ul></dd>
 <dt><a name="makeDir" href="#makeDir"><span>makeDir:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -214,6 +280,10 @@
           data-doc-search-tag="local: method mimeType(d: LocalDriver; path: string): string" href="flysystem/local.html#mimeType.e%2CLocalDriver%2Cstring">local: method mimeType(d: LocalDriver; path: string): string</a></li>
           <li><a class="reference external"
           data-doc-search-tag="policy: method mimeType(p: FilesystemPolicy; path: string): string" href="flysystem/policy.html#mimeType.e%2CFilesystemPolicy%2Cstring">policy: method mimeType(p: FilesystemPolicy; path: string): string</a></li>
+          </ul></dd>
+<dt><a name="mmapFd" href="#mmapFd"><span>mmapFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc mmapFd(fd: cint; size: int): pointer" href="flysystem/securejoin.html#mmapFd%2Ccint%2Cint">securejoin: proc mmapFd(fd: cint; size: int): pointer</a></li>
           </ul></dd>
 <dt><a name="move" href="#move"><span>move:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -244,6 +314,30 @@
 <dt><a name="newLocalDriver" href="#newLocalDriver"><span>newLocalDriver:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: proc newLocalDriver(root: string): LocalDriver" href="flysystem/local.html#newLocalDriver%2Cstring">local: proc newLocalDriver(root: string): LocalDriver</a></li>
+          </ul></dd>
+<dt><a name="normalizeRel" href="#normalizeRel"><span>normalizeRel:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc normalizeRel(root: SecureRoot; relpath: string): string" href="flysystem/securejoin.html#normalizeRel%2CSecureRoot%2Cstring">securejoin: proc normalizeRel(root: SecureRoot; relpath: string): string</a></li>
+          </ul></dd>
+<dt><a name="openSecure" href="#openSecure"><span>openSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc openSecure(root: SecureRoot; relpath: string; flags: cint;
+           mode = Mode(0o000000000666)): cint" href="flysystem/securejoin.html#openSecure%2CSecureRoot%2Cstring%2Ccint">securejoin: proc openSecure(root: SecureRoot; relpath: string; flags: cint;
+           mode = Mode(0o000000000666)): cint</a></li>
+          </ul></dd>
+<dt><a name="openSecureParent" href="#openSecureParent"><span>openSecureParent:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc openSecureParent(root: SecureRoot; relpath: string): tuple[dirFd: cint,
+    base: string]" href="flysystem/securejoin.html#openSecureParent%2CSecureRoot%2Cstring">securejoin: proc openSecureParent(root: SecureRoot; relpath: string): tuple[dirFd: cint,
+    base: string]</a></li>
+          </ul></dd>
+<dt><a name="openSecureRoot" href="#openSecureRoot"><span>openSecureRoot:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc openSecureRoot(path: string): SecureRoot" href="flysystem/securejoin.html#openSecureRoot%2Cstring">securejoin: proc openSecureRoot(path: string): SecureRoot</a></li>
+          </ul></dd>
+<dt><a name="openTempIn" href="#openTempIn"><span>openTempIn:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc openTempIn(dirFd: cint; base: string): tuple[fd: cint, tmp: string]" href="flysystem/securejoin.html#openTempIn%2Ccint%2Cstring">securejoin: proc openTempIn(dirFd: cint; base: string): tuple[fd: cint, tmp: string]</a></li>
           </ul></dd>
 <dt><a name="parseCsv" href="#parseCsv"><span>parseCsv:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -283,6 +377,10 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method read(p: FilesystemPolicy; path: string): string" href="flysystem/policy.html#read.e%2CFilesystemPolicy%2Cstring">policy: method read(p: FilesystemPolicy; path: string): string</a></li>
           </ul></dd>
+<dt><a name="readAllFd" href="#readAllFd"><span>readAllFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc readAllFd(fd: cint): string" href="flysystem/securejoin.html#readAllFd%2Ccint">securejoin: proc readAllFd(fd: cint): string</a></li>
+          </ul></dd>
 <dt><a name="readLines" href="#readLines"><span>readLines:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: iterator readLines(d: LocalDriver; path: string): string" href="flysystem/local.html#readLines.i%2CLocalDriver%2Cstring">local: iterator readLines(d: LocalDriver; path: string): string</a></li>
@@ -290,6 +388,10 @@
 <dt><a name="readLink" href="#readLink"><span>readLink:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="local: method readLink(d: LocalDriver; path: string): string" href="flysystem/local.html#readLink.e%2CLocalDriver%2Cstring">local: method readLink(d: LocalDriver; path: string): string</a></li>
+          </ul></dd>
+<dt><a name="readlinkIn" href="#readlinkIn"><span>readlinkIn:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc readlinkIn(dirFd: cint; base: string): string" href="flysystem/securejoin.html#readlinkIn%2Ccint%2Cstring">securejoin: proc readlinkIn(dirFd: cint; base: string): string</a></li>
           </ul></dd>
 <dt><a name="readStream" href="#readStream"><span>readStream:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -299,9 +401,29 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method readStream(p: FilesystemPolicy; path: string): FlysystemStream" href="flysystem/policy.html#readStream.e%2CFilesystemPolicy%2Cstring">policy: method readStream(p: FilesystemPolicy; path: string): FlysystemStream</a></li>
           </ul></dd>
+<dt><a name="removeSecure" href="#removeSecure"><span>removeSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc removeSecure(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#removeSecure%2CSecureRoot%2Cstring">securejoin: proc removeSecure(root: SecureRoot; relpath: string)</a></li>
+          </ul></dd>
+<dt><a name="removeTreeSecure" href="#removeTreeSecure"><span>removeTreeSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc removeTreeSecure(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#removeTreeSecure%2CSecureRoot%2Cstring">securejoin: proc removeTreeSecure(root: SecureRoot; relpath: string)</a></li>
+          </ul></dd>
+<dt><a name="renameSecure" href="#renameSecure"><span>renameSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc renameSecure(root: SecureRoot; srcRel, dstRel: string)" href="flysystem/securejoin.html#renameSecure%2CSecureRoot%2Cstring%2Cstring">securejoin: proc renameSecure(root: SecureRoot; srcRel, dstRel: string)</a></li>
+          </ul></dd>
 <dt><a name="rules" href="#rules"><span>rules:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="policy: proc rules(p: FilesystemPolicy): PolicyRules" href="flysystem/policy.html#rules%2CFilesystemPolicy">policy: proc rules(p: FilesystemPolicy): PolicyRules</a></li>
+          </ul></dd>
+<dt><a name="SandboxError" href="#SandboxError"><span>SandboxError:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: object SandboxError" href="flysystem/securejoin.html#SandboxError">securejoin: object SandboxError</a></li>
+          </ul></dd>
+<dt><a name="sandboxPassthrough" href="#sandboxPassthrough"><span>sandboxPassthrough:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: template sandboxPassthrough(op: string; path: string; body: untyped): untyped" href="flysystem/securejoin.html#sandboxPassthrough.t%2Cstring%2Cstring%2Cuntyped">securejoin: template sandboxPassthrough(op: string; path: string; body: untyped): untyped</a></li>
           </ul></dd>
 <dt><a name="search" href="#search"><span>search:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -310,6 +432,14 @@
           data-doc-search-tag="local: method search(d: LocalDriver; pattern: string): seq[string]" href="flysystem/local.html#search.e%2CLocalDriver%2Cstring">local: method search(d: LocalDriver; pattern: string): seq[string]</a></li>
           <li><a class="reference external"
           data-doc-search-tag="policy: method search(p: FilesystemPolicy; pattern: string): seq[string]" href="flysystem/policy.html#search.e%2CFilesystemPolicy%2Cstring">policy: method search(p: FilesystemPolicy; pattern: string): seq[string]</a></li>
+          </ul></dd>
+<dt><a name="searchSecure" href="#searchSecure"><span>searchSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc searchSecure(root: SecureRoot; pattern: string): seq[string]" href="flysystem/securejoin.html#searchSecure%2CSecureRoot%2Cstring">securejoin: proc searchSecure(root: SecureRoot; pattern: string): seq[string]</a></li>
+          </ul></dd>
+<dt><a name="SecureRoot" href="#SecureRoot"><span>SecureRoot:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="core: object SecureRoot" href="flysystem/core.html#SecureRoot">core: object SecureRoot</a></li>
           </ul></dd>
 <dt><a name="setVisibility" href="#setVisibility"><span>setVisibility:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -327,6 +457,30 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method size(p: FilesystemPolicy; path: string): int64" href="flysystem/policy.html#size.e%2CFilesystemPolicy%2Cstring">policy: method size(p: FilesystemPolicy; path: string): int64</a></li>
           </ul></dd>
+<dt><a name="sjAT_REMOVEDIR" href="#sjAT_REMOVEDIR"><span>sjAT_REMOVEDIR:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: var sjAT_REMOVEDIR" href="flysystem/securejoin.html#sjAT_REMOVEDIR">securejoin: var sjAT_REMOVEDIR</a></li>
+          </ul></dd>
+<dt><a name="sjAT_SYMLINK_NOFOLLOW" href="#sjAT_SYMLINK_NOFOLLOW"><span>sjAT_SYMLINK_NOFOLLOW:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: var sjAT_SYMLINK_NOFOLLOW" href="flysystem/securejoin.html#sjAT_SYMLINK_NOFOLLOW">securejoin: var sjAT_SYMLINK_NOFOLLOW</a></li>
+          </ul></dd>
+<dt><a name="sjO_DIRECTORY" href="#sjO_DIRECTORY"><span>sjO_DIRECTORY:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: var sjO_DIRECTORY" href="flysystem/securejoin.html#sjO_DIRECTORY">securejoin: var sjO_DIRECTORY</a></li>
+          </ul></dd>
+<dt><a name="sjO_NOFOLLOW" href="#sjO_NOFOLLOW"><span>sjO_NOFOLLOW:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: var sjO_NOFOLLOW" href="flysystem/securejoin.html#sjO_NOFOLLOW">securejoin: var sjO_NOFOLLOW</a></li>
+          </ul></dd>
+<dt><a name="sjS_IROTH" href="#sjS_IROTH"><span>sjS_IROTH:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: var sjS_IROTH" href="flysystem/securejoin.html#sjS_IROTH">securejoin: var sjS_IROTH</a></li>
+          </ul></dd>
+<dt><a name="statMeta" href="#statMeta"><span>statMeta:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc statMeta(relpath: string; st: Stat): FileMetadata" href="flysystem/securejoin.html#statMeta%2Cstring%2CStat">securejoin: proc statMeta(relpath: string; st: Stat): FileMetadata</a></li>
+          </ul></dd>
 <dt><a name="StorageDriver" href="#StorageDriver"><span>StorageDriver:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: type StorageDriver" href="flysystem/core.html#StorageDriver">core: type StorageDriver</a></li>
@@ -335,6 +489,14 @@
 <li><a class="reference external"
           data-doc-search-tag="core: object StorageError" href="flysystem/core.html#StorageError">core: object StorageError</a></li>
           </ul></dd>
+<dt><a name="symlinkIn" href="#symlinkIn"><span>symlinkIn:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc symlinkIn(dirFd: cint; target, base: string)" href="flysystem/securejoin.html#symlinkIn%2Ccint%2Cstring%2Cstring">securejoin: proc symlinkIn(dirFd: cint; target, base: string)</a></li>
+          </ul></dd>
+<dt><a name="tmpBase" href="#tmpBase"><span>tmpBase:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc tmpBase(base: string): string" href="flysystem/securejoin.html#tmpBase%2Cstring">securejoin: proc tmpBase(base: string): string</a></li>
+          </ul></dd>
 <dt><a name="touch" href="#touch"><span>touch:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: method touch(d: StorageDriver; path: string)" href="flysystem/core.html#touch.e%2CStorageDriver%2Cstring">core: method touch(d: StorageDriver; path: string)</a></li>
@@ -342,6 +504,10 @@
           data-doc-search-tag="local: method touch(d: LocalDriver; path: string)" href="flysystem/local.html#touch.e%2CLocalDriver%2Cstring">local: method touch(d: LocalDriver; path: string)</a></li>
           <li><a class="reference external"
           data-doc-search-tag="policy: method touch(p: FilesystemPolicy; path: string)" href="flysystem/policy.html#touch.e%2CFilesystemPolicy%2Cstring">policy: method touch(p: FilesystemPolicy; path: string)</a></li>
+          </ul></dd>
+<dt><a name="touchSecure" href="#touchSecure"><span>touchSecure:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc touchSecure(root: SecureRoot; relpath: string)" href="flysystem/securejoin.html#touchSecure%2CSecureRoot%2Cstring">securejoin: proc touchSecure(root: SecureRoot; relpath: string)</a></li>
           </ul></dd>
 <dt><a name="Visibility" href="#Visibility"><span>Visibility:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -377,6 +543,14 @@
           <li><a class="reference external"
           data-doc-search-tag="policy: method write(p: FilesystemPolicy; path, content: string; visibility = visPrivate)" href="flysystem/policy.html#write.e%2CFilesystemPolicy%2Cstring%2Cstring">policy: method write(p: FilesystemPolicy; path, content: string; visibility = visPrivate)</a></li>
           </ul></dd>
+<dt><a name="writeAllFd" href="#writeAllFd"><span>writeAllFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc writeAllFd(fd: cint; s: string)" href="flysystem/securejoin.html#writeAllFd%2Ccint%2Cstring">securejoin: proc writeAllFd(fd: cint; s: string)</a></li>
+          </ul></dd>
+<dt><a name="writeBufFd" href="#writeBufFd"><span>writeBufFd:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="securejoin: proc writeBufFd(fd: cint; buf: openArray[byte]; n: int)" href="flysystem/securejoin.html#writeBufFd%2Ccint%2CopenArray%5Bbyte%5D%2Cint">securejoin: proc writeBufFd(fd: cint; buf: openArray[byte]; n: int)</a></li>
+          </ul></dd>
 <dt><a name="writeStream" href="#writeStream"><span>writeStream:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="core: method writeStream(d: StorageDriver; path: string; src: File)" href="flysystem/core.html#writeStream.e%2CStorageDriver%2Cstring%2CFile">core: method writeStream(d: StorageDriver; path: string; src: File)</a></li>
@@ -389,7 +563,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-09-15 14:09:55 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-13 10:10:20 UTC</small>
       </div>
     </div>
   </div>
