@@ -99,6 +99,20 @@ when defined(posix):
 proc sandboxErr(path: string): ref SandboxError =
   newException(SandboxError, "Path traversal detected: " & path)
 
+template sandboxPassthrough*(op: string, path: string,
+    body: untyped): untyped =
+  ## Run `body`, letting `SandboxError` through unwrapped (so its
+  ## "Path traversal detected: ..." message stays byte-identical for
+  ## callers that assert on it) while wrapping anything else with operation
+  ## context. Platform-agnostic: on non-POSIX targets the descriptor walk
+  ## is unavailable, so callers are expected to use the lexical fallback
+  ## (`containedStr`) and plain `std/os` operations inside `body`.
+  try: body
+  except SandboxError: raise
+  except CatchableError as e:
+    raise newException(StorageError,
+      "Failed to " & op & " '" & path & "': " & e.msg)
+
 proc lexSplit(orig: string): seq[string] =
   ## Split a driver-relative path into plain components, resolving `.` and
   ## clamping `..` at the root. Anything that would leave the root raises
@@ -713,18 +727,6 @@ when defined(posix):
               $strerror(errnoCode()))
         else:
           copyFileSecure(root, srcEntry, dstEntry)
-
-  template sandboxPassthrough*(op: string, path: string,
-      body: untyped): untyped =
-    ## Run `body`, letting `SandboxError` through unwrapped (so its
-    ## "Path traversal detected: ..." message stays byte-identical for
-    ## callers that assert on it) while wrapping anything else with operation
-    ## context.
-    try: body
-    except SandboxError: raise
-    except CatchableError as e:
-      raise newException(StorageError,
-        "Failed to " & op & " '" & path & "': " & e.msg)
 
   proc symlinkIn*(dirFd: cint, target, base: string) =
     ## Create symlink `base` in the held `dirFd` pointing at `target`.
