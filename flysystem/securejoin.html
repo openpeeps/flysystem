@@ -729,7 +729,7 @@
   <dt><pre><span class="Keyword">template</span> <a href="#sandboxPassthrough.t%2Cstring%2Cstring%2Cuntyped"><span class="Identifier">sandboxPassthrough</span></a><span class="Other">(</span><span class="Identifier">op</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">body</span><span class="Other">:</span> <span class="Identifier">untyped</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
   <dd>
     
-    Run <tt class="docutils literal"><span class="pre"><span class="Identifier">body</span></span></tt>, letting <tt class="docutils literal"><span class="pre"><span class="Identifier">SandboxError</span></span></tt> through unwrapped (so its &quot;Path traversal detected: ...&quot; message stays byte-identical for callers that assert on it) while wrapping anything else with operation context.
+    Run <tt class="docutils literal"><span class="pre"><span class="Identifier">body</span></span></tt>, letting <tt class="docutils literal"><span class="pre"><span class="Identifier">SandboxError</span></span></tt> through unwrapped (so its &quot;Path traversal detected: ...&quot; message stays byte-identical for callers that assert on it) while wrapping anything else with operation context. Platform-agnostic: on non-POSIX targets the descriptor walk is unavailable, so callers are expected to use the lexical fallback (<tt class="docutils literal"><span class="pre"><span class="Identifier">containedStr</span></span></tt>) and plain <tt class="docutils literal"><span class="pre"><span class="Identifier">std</span><span class="Operator">/</span><span class="Identifier">os</span></span></tt> operations inside <tt class="docutils literal"><span class="pre"><span class="Identifier">body</span></span></tt>.
     
   </dd>
 </div>
@@ -745,7 +745,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-13 10:10:25 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-17 19:13:01 UTC</small>
       </div>
     </div>
   </div>
