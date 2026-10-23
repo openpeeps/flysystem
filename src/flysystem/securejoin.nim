@@ -80,13 +80,13 @@ when defined(posix):
         importc: "futimens", header: "<sys/time.h>".}
   else:
     proc sjRenameat(olddirfd: cint, oldpath: cstring, newdirfd: cint,
-        newpath: cstring): cint {.importc: "renameat", header: "<fcntl.h>".}
+        newpath: cstring): cint {.importc: "renameat", header: "<stdio.h>".}
     proc sjSymlinkat(target: cstring, newdirfd: cint,
-        linkpath: cstring): cint {.importc: "symlinkat", header: "<fcntl.h>".}
+        linkpath: cstring): cint {.importc: "symlinkat", header: "<unistd.h>".}
     proc sjReadlinkat(dirfd: cint, path: cstring, buf: cstring,
-        bufsiz: int): int {.importc: "readlinkat", header: "<fcntl.h>".}
+        bufsiz: int): int {.importc: "readlinkat", header: "<unistd.h>".}
     proc sjFutimens(fd: cint, times: pointer): cint {.
-        importc: "futimens", header: "<fcntl.h>".}
+        importc: "futimens", header: "<sys/stat.h>".}
   proc sjFdopendir(fd: cint): ptr DIR {.importc: "fdopendir",
       header: "<dirent.h>".}
   var sjO_NOFOLLOW* {.importc: "O_NOFOLLOW", header: "<fcntl.h>".}: cint
