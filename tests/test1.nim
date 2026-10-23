@@ -155,7 +155,10 @@ test "size, lastModified, checksum, mimeType, metadata":
   check d.mimeType("hello.txt") == "text/plain"
   check d.mimeType("noext") == "application/octet-stream"
 
-  let before = getTime()
+  # Filesystem mtimes have coarse granularity (a few ms on Linux), so a
+  # mtime captured just after `before` can land a few ms earlier. Tolerate
+  # a small skew to keep the assertion stable across platforms.
+  let before = getTime() - initDuration(milliseconds = 50)
   d.write("stamp.txt", "x")
   check d.lastModified("stamp.txt") >= before
 

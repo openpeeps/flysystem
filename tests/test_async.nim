@@ -37,7 +37,7 @@ test "async metadata/size/lastModified/checksum/mimeType":
     check m.path == "hello.txt"
     check m.size == 11
     check not m.isDir
-    let before = getTime()
+    let before = getTime() - initDuration(milliseconds = 50)
     await d.write("stamp.txt", "x")
     check (await d.lastModified("stamp.txt")) >= before
     # missing file raises StorageError
