@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.2.2"
+version       = "0.2.3"
 author        = "George Lemon"
 description   = "Multi-driver Filesystem. Atomic Writes, Policy Rules, Locks, Multi-disks and more"
 license       = "MIT"
